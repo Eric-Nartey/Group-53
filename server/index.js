@@ -1,8 +1,7 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
+const connect= require("./Connection")
 // Load environment variables
 dotenv.config();
 
@@ -10,19 +9,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(bodyParser.json());
+app.use(express.json()); // For parsing JSON request bodies
+app.use(cookieParser()); // For parsing cookies
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+
 
 // Import routes
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const supervisorRoutes = require('./routes/supervisorRoutes');
-const attendanceRoutes = require('./routes/attendanceRoutes');
-const craneRoutes = require('./routes/craneRoutes');
+const authRoutes = require('./Routes/AuthRoutes');
+const userRoutes = require('./Routes/UserRoutes');
+const supervisorRoutes = require('./Routes/SupervisorRoutes');
+const attendanceRoutes = require('./Routes/AttendanceRoutes');
+const craneRoutes = require('./Routes/CraneRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -32,6 +29,14 @@ app.use('/api/attendances', attendanceRoutes);
 app.use('/api/cranes', craneRoutes);
 
 // Start the server
+async  function start(){
+try{
+    await connect()
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+}catch(error){
+    console.log(error)
+}
+}
+start()
