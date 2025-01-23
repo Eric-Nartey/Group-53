@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['Worker', 'Supervisor'], required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
+  password: { type: String, required: true },
   assigned_crane_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Crane', default: null }
 });
 

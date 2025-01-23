@@ -4,10 +4,10 @@ const User = require('../Models/User');
 
 // Sample login route (you can add more auth logic later)
 router.post('/login', async (req, res) => {
-  const { email, phone } = req.body;
+  const { email, password, } = req.body;
   
   try {
-    const user = await User.findOne({ email, phone });
+    const user = await User.findOne({ email, password });
     if (user) {
       res.status(200).json({ message: 'Login successful', user });
     } else {
