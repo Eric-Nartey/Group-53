@@ -1,0 +1,18 @@
+.crane-location {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+  }
+  
+  h4 {
+    font-size: 18px;
+    color: #1e3a8a;
+  }
+  
+  p {
+    margin: 5px 0;
+    color: #4b5563;
+  }
+  
