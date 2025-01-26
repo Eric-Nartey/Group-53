@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from "../api/api";
 import '../Styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -21,10 +21,46 @@ const AdminDashboard = () => {
         setAttendance(response.data);
     };
 
-    const postLxc = async () => {
-        const response = await axios.post('/api/users/attendance');
-        alert(response.data)
+    const getLxc = async () => {
+    try{
+        const response = await axios.get('/api/lxcRadio/get-lxcs');
+        console.log(response.data)
+    }catch(error){
+        console.log(error)
+    }
     };
+
+    const getRadio = async () => {
+        try{
+        const response = await axios.get('/api/lxcRadio/get-radios');
+        console.log(response.data)
+        }catch(error){
+            console.log(error)
+        }
+    };
+
+    const postRadio = async () => {
+        try{
+        const response= await axios.post('/api/lxcRadio/post-radio',{radioNumber:newRadio});
+        console.log(response.data)
+        }catch(error){
+            console.log(error)
+        }
+    };
+
+    const postLxc = async () => {
+        try{
+        const response=await axios.post('/api/lxcRadio/post-lxc',{lxcNumber:newLxc});
+         console.log(response.data)
+        }catch(error){
+            console.log(error)
+        }
+    };
+
+    useEffect(()=>{
+        getLxc()
+        getRadio()
+    },[])
     
 
     const handleInputChange = (e) => {
@@ -78,11 +114,11 @@ const AdminDashboard = () => {
                     onChange={(e) => setNewLxc(e.target.value)}
                 />
                 
-                <button onClick={handleAddUser}>Add User</button>
+                <button onClick={postLxc}>Add User</button>
             </div>
 
             <div className="add-user">
-                <h2>Add Lxc</h2>
+                <h2>Add Radio</h2>
                
                
                 <input
@@ -92,7 +128,7 @@ const AdminDashboard = () => {
                     value={newRadio}
                     onChange={(e) => setNewRadio(e.target.value)}
                 />
-                <button onClick={handleAddUser}>Add Radio</button>
+                <button onClick={postRadio}>Add Radio</button>
             </div>
 
             <div className="users-list">

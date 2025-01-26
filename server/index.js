@@ -27,6 +27,7 @@ const userRoutes = require('./Routes/UserRoutes');
 const supervisorRoutes = require('./Routes/SupervisorRoutes');
 const attendanceRoutes = require('./Routes/AttendanceRoutes');
 const craneRoutes = require('./Routes/CraneRoutes');
+const adminRoutes = require('./Routes/AdminRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -34,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/supervisors', supervisorRoutes);
 app.use('/api/attendances', attendanceRoutes);
 app.use('/api/cranes', craneRoutes);
+app.use('/api/lxcRadio', adminRoutes);
 
 
 
