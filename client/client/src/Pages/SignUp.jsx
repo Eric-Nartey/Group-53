@@ -10,7 +10,7 @@ const SignupPage = () => {
     fullname: '',
     email: '',
     password: '',
-    role: 'Supervisor',
+    role: 'Worker',
   });
 
 
@@ -95,8 +95,8 @@ const SignupPage = () => {
             value={formData.role}
             onChange={handleInputChange}
           >
-            <option value="supervisor">Supervisor</option>
-            <option value="worker">Worker</option>
+            <option value="Supervisor">Supervisor</option>
+            <option value="Worker">Worker</option>
           </select>
         </div>
 

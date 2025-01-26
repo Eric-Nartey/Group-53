@@ -62,8 +62,12 @@ router.post('/login', Limiter,async (req, res) => {
       sameSite: 'Strict',      // Specifies same-site cookie attribute to prevent cross-site request forgery
       maxAge: 1000 * 60 * 60 * 24
 }); // Set the refresh token as a cookie and send to the client browser
-    res.status(200).json({message:"User logged in"}) // Return a success message
-  
+
+if(findUser.role==="Supervisor"){
+    res.status(200).json({message:"User logged in supervisor"}) // Return a success message
+}else{
+    res.status(201).json({message:"User logged in worker"})
+}
   } catch (error) {
     res.status(500).json({ message: 'Error creating user', error });
   }

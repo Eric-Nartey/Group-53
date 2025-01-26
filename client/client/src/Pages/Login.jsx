@@ -1,28 +1,55 @@
 import  { useState } from "react";
 import axios from "../api/api";
 import "../Styles/Login.css";
+import Swal from 'sweetalert2'
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate()
+  const [error, setError] = useState("")
 
+  function inputFocus(){
+    setError("")
+  }
 
   axios.defaults.withCredentials = true
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
        const response= await axios.post("/api/users/login", { email, password });
-       if(response.status===200){
-          navigate('/dashboard')
-          alert("Login successful!");
-       }else{
-          alert("login failed")
-       }
+       switch (response.status) {
+        case 200:
+            Swal.fire({
+                title: "Login successful",
+                icon: "success",
+                timer: 2000 // close popup alert after 2 seconds
+            });
+            navigate('/Admindashboard');
+            break;
+        case 201:
+            Swal.fire({
+                title: "Login successful",
+                icon: "success",
+                timer: 2000 // close popup alert after 2 seconds
+            });
+            navigate('/Dashboard');
+            break;
+
+        
+        default:
+            setError("Too many attempsts, try again later")
+            break;
+    }
       
     } catch (error) {
-      alert("Login failed!");
+      if(error.response.status===400|| error.response.status===404){
+         setError("Invalid crediatials")
+      }else{
+        alert("Login failed!");
+      }
+      
       console.log(error)
     }
   };
@@ -35,6 +62,7 @@ const Login = () => {
           type="email"
           placeholder="Email"
           value={email}
+          onFocus={inputFocus}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
@@ -42,9 +70,11 @@ const Login = () => {
           type="password"
           placeholder="Password"
           value={password}
+          onFocus={inputFocus}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <p style={{color:"red"}}>{error}</p>
         <button type="submit">Login</button>
       </form>
     </div>
