@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import CraneLocation from "./Crane";
 import Attendance from "./Attendance";
 import { useNavigate } from "react-router-dom";
+import axios from "../api/api";
 import "../Styles/Dashboard.css";
 
-function Dashboard({ user }) {
+function Dashboard( ) {
   const [shiftStarted, setShiftStarted] = useState(false);
   const [location, setLocation] = useState(null);
   const [currentShift, setCurrentShift] = useState("");
@@ -13,8 +14,28 @@ function Dashboard({ user }) {
   const [lxcNumber, setLxcNumber] = useState("");
   const [radioAssigned, setRadioAssigned] = useState(false);
   const [lxcAssigned, setLxcAssigned] = useState(false);
+  const [user, setUser] = useState("")
 
   const navigate = useNavigate();
+
+
+  useEffect(()=>{
+
+  const getUsername = async () => {
+    
+    try {
+       const response= await axios.get("/api/users/me",{
+        withCredentials: true,
+      });
+       setUser(response.data)
+      
+    } catch (error) {
+     
+      console.log(error)
+    }
+  };
+  getUsername()
+},[])
 
   // Shift rotation logic
   const calculateShift = () => {
@@ -90,9 +111,9 @@ function Dashboard({ user }) {
 
   return (
     <div className="dashboard-container">
-      <h2>Welcome, {user.username}</h2>
+      <h2>Welcome, {user}</h2>
       <div className="shift-details">
-        <h3>Today's Shift: {currentShift}</h3>
+        <h3>Today&lsquo;s Shift: {currentShift}</h3>
         <h4>Next Shift: {nextShift}</h4>
 
         {currentShift !== "Off" && (

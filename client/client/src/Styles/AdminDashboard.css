@@ -1,0 +1,59 @@
+.admin-dashboard {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.admin-dashboard h1 {
+    text-align: center;
+    color: #333;
+}
+
+.add-user, .users-list, .attendance-list {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.add-user h2, .users-list h2, .attendance-list h2 {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.add-user input {
+    display: block;
+    width: 95%;
+    padding: 10px 2.5%;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.add-user button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-user button:hover {
+    background-color: #0056b3;
+}
+
+.users-list ul, .attendance-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.users-list li, .attendance-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-list li:last-child, .attendance-list li:last-child {
+    border-bottom: none;
+}

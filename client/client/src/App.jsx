@@ -4,6 +4,8 @@ import Navbar from "./Components/Navbar";
 import Dashboard from "./Pages/Dashboard";
 import Login from "./Pages/Login";
 import "./App.css"
+import AdminDashboard from "./Pages/AdminDashboard";
+import SignupPage from "./Pages/SignUp";
 
 const App = () => {
   const user = { username: "John Doe" }; // Mock user data
@@ -13,7 +15,12 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard user={user}/>} />
+        <Route path="AdminDashboard" element={<AdminDashboard/>} />
+        <Route path="/signup" element={<SignupPage />} />
+      
       </Routes>
+
+
     </Router>
   );
 };
