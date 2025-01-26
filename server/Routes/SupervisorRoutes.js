@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Supervisor = require('../Models/Supervisor');
+const verifyAdmin = require('../Middleware/Adminware');
 
 // Create a supervisor and assign a radio
-router.post('/', async (req, res) => {
+router.post('/',verifyAdmin, async (req, res) => {
   const { user_id, assigned_radio } = req.body;
   
   try {

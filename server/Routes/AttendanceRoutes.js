@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Attendance = require('../Models/Attendance');
-const verifyRefreshToken= require('../Middleware/Middleware');
 const { Radio, Lxc } = require('../Models/Radio&Lxc');
+const verifyAdmin = require('../Middleware/Adminware');
 // Record attendance for a user
 
 
-router.post('/attendance',verifyRefreshToken, async (req, res) => {
+router.post('/attendance',verifyAdmin, async (req, res) => {
   const { user_id, shift_id,radio,lxc, date, sign_in_time } = req.body;
 
   try {
@@ -23,7 +23,7 @@ router.post('/attendance',verifyRefreshToken, async (req, res) => {
 });
 
 // Mark sign-out for attendance
-router.put('/:attendance_id',verifyRefreshToken, async (req, res) => {
+router.put('/:attendance_id',verifyAdmin, async (req, res) => {
   const { attendance_id } = req.params;
   const { sign_out_time } = req.body;
 

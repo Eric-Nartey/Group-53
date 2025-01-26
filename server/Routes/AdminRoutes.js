@@ -1,10 +1,11 @@
 const express = require('express');
 const { Lxc, Radio } = require('../Models/Radio&Lxc');
+const verifyAdmin = require('../Middleware/Adminware');
 
 const router = express.Router();
 
 // Route to add a new LXC
-router.post('/post-lxc', async(req, res) => {
+router.post('/post-lxc',verifyAdmin, async(req, res) => {
     const {lxcNumber} = req.body;
     console.log(lxcNumber)
     try{
@@ -22,7 +23,7 @@ router.post('/post-lxc', async(req, res) => {
 
 
 // Route to add a new Radio
-router.post('/post-radio',async (req, res) => {
+router.post('/post-radio',verifyAdmin,async (req, res) => {
     const {radioNumber} = req.body;
     console.log(newRadio)
     try{
@@ -37,7 +38,7 @@ router.post('/post-radio',async (req, res) => {
 });
 
 
-router.get('/get-lxcs', async(req, res) => {
+router.get('/get-lxcs',verifyAdmin, async(req, res) => {
     
     try{
 
@@ -50,7 +51,7 @@ router.get('/get-lxcs', async(req, res) => {
     
 });
 
-router.get('/get-radios', async(req, res) => {
+router.get('/get-radios',verifyAdmin, async(req, res) => {
     
     try{
 

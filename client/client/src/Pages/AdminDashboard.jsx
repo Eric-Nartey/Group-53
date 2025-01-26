@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from "../api/api";
+import Swal from 'sweetalert2'
 import '../Styles/AdminDashboard.css';
+import {useNavigate} from 'react-router-dom'
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
@@ -21,9 +23,12 @@ const AdminDashboard = () => {
         setAttendance(response.data);
     };
 
+
+    const navigate = useNavigate()
     const getLxc = async () => {
     try{
         const response = await axios.get('/api/lxcRadio/get-lxcs');
+        
         console.log(response.data)
     }catch(error){
         console.log(error)
@@ -36,6 +41,15 @@ const AdminDashboard = () => {
         console.log(response.data)
         }catch(error){
             console.log(error)
+            if(error.status===405){
+                Swal.fire({
+                    title:"You're not authorized to view this page",
+                    icon:"error",
+                    timer:3000
+                })
+                navigate(-1);
+                return
+            }
         }
     };
 

@@ -53,7 +53,7 @@ router.post('/login', Limiter,async (req, res) => {
      return res.status(400).json({message:"Invalid credentials"})
     }
 
-    const signed= jwt.sign({id:findUser._id},process.env.REFRESH_TOKEN,{expiresIn:"1d"}) // Create a new refresh token with a 1-day expiry
+    const signed= jwt.sign({id:findUser._id,role:findUser.role},process.env.REFRESH_TOKEN,{expiresIn:"1d"}) // Create a new refresh token with a 1-day expiry
 
     res.cookie('refreshToken', signed, {
       httpOnly: true,   // Ensures that the cookie is only accessible via HTTP(S) requests
@@ -64,9 +64,9 @@ router.post('/login', Limiter,async (req, res) => {
 }); // Set the refresh token as a cookie and send to the client browser
 
 if(findUser.role==="Supervisor"){
-    res.status(200).json({message:"User logged in supervisor"}) // Return a success message
+    res.status(200).json({message:"supervisor logged in "}) // Return a success message
 }else{
-    res.status(201).json({message:"User logged in worker"})
+    res.status(201).json({message:"Worker logged in "})
 }
   } catch (error) {
     res.status(500).json({ message: 'Error creating user', error });

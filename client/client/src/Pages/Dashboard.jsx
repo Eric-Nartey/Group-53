@@ -38,7 +38,7 @@ function Dashboard( ) {
 },[])
 
   // Shift rotation logic
-  const calculateShift = () => {
+  const calculateShift = (group) => {
     const startDate = new Date("2025-01-01"); // Example start of rotation
     const currentDate = new Date();
     const daysSinceStart = Math.floor(
@@ -46,17 +46,30 @@ function Dashboard( ) {
     );
     const rotation = daysSinceStart % 6; // 6-day cycle
 
-    if (rotation === 0 || rotation === 1) {
-      return { current: "Morning", next: "Evening" };
-    } else if (rotation === 2 || rotation === 3) {
-      return { current: "Evening", next: "Off" };
-    } else {
-      return { current: "Off", next: "Morning" };
+    let shift;
+    if (group === 'A') {
+        if (rotation === 0 || rotation === 1) {
+            shift = { current: "Morning", next: "Evening" };
+        } else if (rotation === 2 || rotation === 3) {
+            shift = { current: "Evening", next: "Off" };
+        } else {
+            shift = { current: "Off", next: "Morning" };
+        }
+    } else if (group === 'B') {
+        if (rotation === 0 || rotation === 1) {
+            shift = { current: "Evening", next: "Off" };
+        } else if (rotation === 2 || rotation === 3) {
+            shift = { current: "Off", next: "Morning" };
+        } else {
+            shift = { current: "Morning", next: "Evening" };
+        }
     }
-  };
+
+    return shift;
+};
 
   useEffect(() => {
-    const shift = calculateShift();
+    const shift = calculateShift("A");
     setCurrentShift(shift.current);
     setNextShift(shift.next);
   }, []);
