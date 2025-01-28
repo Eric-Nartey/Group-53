@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import '../Styles/Signup.css';
 import axios from "../api/api";
+import {Link} from "react-router-dom"
 import {useNavigate} from 'react-router-dom'
 
 
@@ -86,21 +87,20 @@ const SignupPage = () => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form-group role">
           <label htmlFor="role" className="form-label">Role</label>
-          <select
-            id="role"
-            name="role"
-            className="form-select"
-            value={formData.role}
-            onChange={handleInputChange}
-          >
-            <option value="Supervisor">Supervisor</option>
-            <option value="Worker">Worker</option>
-          </select>
+          <label htmlFor='supervisor'>
+            <input name="role" id="supervisor" type="radio" value="Supervisor" onChange={handleInputChange}></input>
+            Supervisor</label>
+            <label htmlFor='worker'>
+            <input name="role" id="worker" type="radio" value="Worker" onChange={handleInputChange}></input>
+            Worker
+            </label>
         </div>
 
         <button type="submit" className="form-button">Sign Up</button>
+
+        <Link to={"/"}>Already have an account?</Link>
       </form>
     </div>
   );

@@ -3,6 +3,7 @@ import CraneLocation from "./Crane";
 import Attendance from "./Attendance";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
+import Swal from "sweetalert2"
 import "../Styles/Dashboard.css";
 
 function Dashboard( ) {
@@ -15,6 +16,7 @@ function Dashboard( ) {
   const [radioAssigned, setRadioAssigned] = useState(false);
   const [lxcAssigned, setLxcAssigned] = useState(false);
   const [user, setUser] = useState("")
+  const [isCompleted, setIsCompleted] = useState(false)
 
   const navigate = useNavigate();
 
@@ -37,14 +39,18 @@ function Dashboard( ) {
   getUsername()
 },[])
 
+const [tomorrow,setTomorrow]= useState("")
   // Shift rotation logic
   const calculateShift = (group) => {
     const startDate = new Date("2025-01-01"); // Example start of rotation
     const currentDate = new Date();
+    const tomorrowDate = new Date();
+setTomorrow(tomorrowDate.setDate(currentDate.getDate() + 1))
+
     const daysSinceStart = Math.floor(
       (currentDate - startDate) / (1000 * 60 * 60 * 24)
     );
-    const rotation = daysSinceStart % 6; // 6-day cycle
+    const rotation = daysSinceStart % 7; // 6-day cycle
 
     let shift;
     if (group === 'A') {
@@ -52,21 +58,37 @@ function Dashboard( ) {
             shift = { current: "Morning", next: "Evening" };
         } else if (rotation === 2 || rotation === 3) {
             shift = { current: "Evening", next: "Off" };
-        } else {
+        } else if(rotation === 4 || rotation === 5){
             shift = { current: "Off", next: "Morning" };
-        }
+        } else {
+          shift = { current: "Morning", next: "Evening" };
+      }
     } else if (group === 'B') {
         if (rotation === 0 || rotation === 1) {
             shift = { current: "Evening", next: "Off" };
         } else if (rotation === 2 || rotation === 3) {
             shift = { current: "Off", next: "Morning" };
-        } else {
+        } else if(rotation === 4 || rotation === 5) {
             shift = { current: "Morning", next: "Evening" };
+        }else {
+            shift = { current: "Evening", next: "Off" };
         }
-    }
+    } else if (group === 'C') {
+      if (rotation === 0 || rotation === 1) {
+          shift = { current: "Off", next: "Morning" };
+      } else if (rotation === 2 || rotation === 3) {
+          shift = { current: "Morning", next: "Evening" };
+      } else if (rotation === 4 || rotation === 5) {
+          shift = { current: "Evening", next: "Off" };
+      } else {
+          shift = { current: "Off", next: "Morning" };
+      }
+  }
 
     return shift;
 };
+
+axios.defaults.withCredentials = true
 
   useEffect(() => {
     const shift = calculateShift("A");
@@ -82,19 +104,41 @@ function Dashboard( ) {
     setLxcNumber(e.target.value);
   };
 
-  const handleStartShift = () => {
+  const handleStartShift = async() => {
+    try{
+      axios.defaults.withCredentials = true
     if (currentShift === "Off") {
       alert("You are off duty today. Enjoy your day off!");
       return;
     }
+    if (isCompleted===true){
+        Swal.fire({
+          title: "Shift already completed",
+          icon: "warning",
+          timer: 3000
+        })
+        return
+    }
+    
     if (!radioNumber || !lxcNumber) {
-      alert("Please input both your radio number and LXC number before starting the shift!");
+      Swal.fire({
+        title: "Please enter both Radio and LXC numbers",
+        icon: "warning",
+        timer: 3000
+      })
       return;
     }
+    const response= await axios.post("api/shift/start-shift",{lxcNumber,radioNumber,currentShift})
+    console.log(response.data)
+   
     setShiftStarted(true);
     setRadioAssigned(true);
     setLxcAssigned(true);
     startLocationTracking();
+}catch(error){
+  console.log(error)
+}
+
   };
 
   const startLocationTracking = () => {
@@ -106,28 +150,60 @@ function Dashboard( ) {
     });
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async() => {
     if (!shiftStarted) {
       alert("Shift has not started yet!");
       return;
     }
-    alert(
-      `Shift completed. Radio (${radioNumber}) and LXC (${lxcNumber}) have been signed out.`
-    );
+    try{
+      const response = await axios.post("/api/shift/end-shift")
+    
+
+      if(response.status===200){
+   
     setShiftStarted(false);
     setRadioNumber("");
     setLxcNumber("");
     setRadioAssigned(false);
     setLxcAssigned(false);
     navigate("/");
+
+    return
+      }
+      console.log(error)
+
+  }catch(error){
+     console.log(error)
+  }
   };
+
+  useEffect(()=>{
+      const getShift = async () =>{
+        try{
+       const response=await axios.get("api/shift/check-shift")
+
+       console.log(response)
+        if(response.data==="Shift has started today."){
+          console.log(response.data)
+          setShiftStarted(true)
+        }else if(response.status===201){
+          setShiftStarted(false)
+          console.log("new")
+          setIsCompleted(true)
+        }
+      }catch(error){
+        console.log(error)
+      }
+    }
+    getShift() 
+  },[])
 
   return (
     <div className="dashboard-container">
       <h2>Welcome, {user}</h2>
       <div className="shift-details">
-        <h3>Today&lsquo;s Shift: {currentShift}</h3>
-        <h4>Next Shift: {nextShift}</h4>
+        <h3>Today&rsquo;s Shift: {currentShift}</h3>
+        <h4>Next Shift: {nextShift}</h4>   <h4>{tomorrow}</h4>
 
         {currentShift !== "Off" && (
           <div>
@@ -160,13 +236,28 @@ function Dashboard( ) {
           </div>
         )}
 
+        {isCompleted && <button style={{padding:"6px",cursor:"not-allowed" ,marginTop:"20px"}}>Today's shift completed</button>}
+
+        <div style={{display:`${isCompleted===false ? "flex" : "none"}`}}>
         <button
           onClick={handleStartShift}
           className="start-shift-btn"
-          disabled={currentShift === "Off" || (radioAssigned && lxcAssigned)}
+          disabled={currentShift === "Off" || shiftStarted || (radioAssigned && lxcAssigned)}
         >
           {currentShift === "Off" ? "No Shift Today" : "Start Shift"}
         </button>
+
+        
+
+        <button
+          onClick={handleSignOut}
+          className="sign-out-btn"
+          disabled={!shiftStarted}
+        >
+          Sign Out
+        </button>
+        </div>
+
 
         {shiftStarted && location && (
           <div className="location-tracking">
@@ -176,14 +267,6 @@ function Dashboard( ) {
             <CraneLocation location={location} />
           </div>
         )}
-
-        <button
-          onClick={handleSignOut}
-          className="sign-out-btn"
-          disabled={!shiftStarted}
-        >
-          Sign Out
-        </button>
       </div>
       <Attendance />
     </div>

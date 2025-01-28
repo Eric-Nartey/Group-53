@@ -1,6 +1,7 @@
 import  { useState } from "react";
 import axios from "../api/api";
 import "../Styles/Login.css";
+import {Link} from "react-router-dom"
 import Swal from 'sweetalert2'
 import { useNavigate } from "react-router-dom";
 
@@ -34,7 +35,7 @@ const Login = () => {
                 icon: "success",
                 timer: 2000 // close popup alert after 2 seconds
             });
-            navigate('/Dashboard');
+            navigate('/u/Dashboard');
             break;
 
         
@@ -55,6 +56,7 @@ const Login = () => {
   };
 
   return (
+    <div className="parent">
     <div className="login">
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
@@ -75,8 +77,12 @@ const Login = () => {
           required
         />
         <p style={{color:"red"}}>{error}</p>
-        <button type="submit">Login</button>
+        <button type="submit" className="submit">Login</button>
+        <button type="button" className="link">
+        <Link to={"/signup"} > Don't have an account?</Link>
+        </button>
       </form>
+    </div>
     </div>
   );
 };

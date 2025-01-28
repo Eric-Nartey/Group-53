@@ -20,6 +20,7 @@ const verifyRefreshToken = (req, res, next) => {
     // Attach decoded data to the request object
     req.user = decoded;
     
+    
     next(); // Proceed to the next middleware
   } catch (err) {
     return res.status(403).json({ message: 'Invalid refresh token' });

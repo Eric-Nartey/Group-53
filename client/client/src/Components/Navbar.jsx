@@ -8,13 +8,11 @@ const Navbar = () => {
       <h1 className="navbar-logo">Attendance System</h1>
       <ul className="navbar-links">
         <li>
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/u/dashboard">Dashboard</Link>
         </li>
+        
         <li>
-          <Link to="/shift-assignment">Shift Assignment</Link>
-        </li>
-        <li>
-          <Link to="/attendance-records">Attendance</Link>
+          <Link to="/u/attendance-records">Attendance</Link>
         </li>
       </ul>
     </nav>

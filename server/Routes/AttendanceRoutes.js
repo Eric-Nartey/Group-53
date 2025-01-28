@@ -14,7 +14,7 @@ router.post('/attendance',verifyAdmin, async (req, res) => {
     if(!radioIndetification) return res.status(404).json({message:'Radio numder not found'}) 
       const lxcIndetification= await Lxc.findOne({lxc_number:lxc})
     if(!lxcIndetification) return res.status(404).json({message:'lxc numder not found'}) 
-    const newAttendance = new Attendance({ user_id, shift_id, date,sign_in_time });
+    const newAttendance = new Attendance({ user_id, shift, date,sign_in_time });
     await newAttendance.save();
     res.status(201).json(newAttendance);
   } catch (error) {
