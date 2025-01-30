@@ -1,6 +1,27 @@
+.flex-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 35px;
+    width: 90%;
+    margin-inline: auto;
+}
+
+.flex-button{
+    display: flex;
+    gap: 10px;
+    
+
+    & button{
+        padding: 10px 20px;
+        background-color: #007bff;
+        border-radius: 5px;
+    }
+}
+
 .admin-dashboard {
     font-family: Arial, sans-serif;
-    padding: 20px;
+    
     background-color: #f9f9f9;
 }
 
@@ -9,9 +30,35 @@
     color: #333;
 }
 
-.add-user, .users-list, .attendance-list {
+
+.pop-cover{
+    position: fixed;
+    
+    
+    z-index: 1;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+.add-user{
+    position: inherit;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 20px;
+    width: 300px;
+    margin: auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.users-list, .attendance-list {
     margin: 20px 0;
     padding: 20px;
+    width: 90%;
+    margin-inline: auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -57,3 +104,62 @@
 .users-list li:last-child, .attendance-list li:last-child {
     border-bottom: none;
 }
+
+.flex-button2 {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #007bff;
+    background-color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tab-button:hover {
+    background-color: #80b3e9;
+}
+
+.tab-button:focus {
+    outline: none;
+    
+}
+
+.tab-button.active {
+    background-color: #0056b3;
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+
+.users-table{
+    width: 95%; /* Equivalent to w-[95%] */
+  background-color: white; /* Equivalent to bg-white */
+  margin-top: 12px; /* Equivalent to mt-3 (3 * 4px) */
+  overflow: hidden;
+  
+.user-th{
+    border: 1px solid #d1d5db; /* Equivalent to border-gray-300 */
+  padding: 8px 16px; /* Equivalent to px-4 py-2 */
+  text-align: left;
+}
+.users-td{
+    border: 1px solid #d1d5db; /* Equivalent to border-gray-300 */
+  padding: 8px 16px; /* Equivalent to px-4 py-2 */
+}
+
+.users-tr {
+    border-bottom: 1px solid #e7e5e4; /* Equivalent to border-stone-200 */
+    height: 35px; /* Equivalent to h-[35px] */
+    position: relative; /* Equivalent to relative */
+  }
+  

@@ -7,13 +7,26 @@ import {useNavigate} from 'react-router-dom'
 
 
 const SignupPage = () => {
+  const [selectedRole, setSelectedRole] = useState("");
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
     password: '',
-    role: 'Worker',
+    role: '',
   });
 
+ 
+ 
+
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
+  };
+
+  const [selectedGroup, setSelectedGroup] = useState("");
+
+  const handleGroupChange = (event) => {
+    setSelectedGroup(event.target.value);
+  };
 
   const navigate =useNavigate()
   const handleInputChange = (e) => {
@@ -27,7 +40,7 @@ const SignupPage = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-       const response= await axios.post("/api/users/signup", {formData});
+       const response= await axios.post("/api/users/signup", {...formData,selectedRole,selectedGroup});
        if(response.status===200){
           navigate('/')
           alert("Login successful!");
@@ -46,7 +59,7 @@ const SignupPage = () => {
       <h1 className="signup-title">Sign Up</h1>
       <form className="signup-form" onSubmit={handleSignup}>
         <div className="form-group">
-          <label htmlFor="fullname" className="form-label">Full Name</label>
+          
           <input
             type="text"
             id="fullname"
@@ -60,7 +73,7 @@ const SignupPage = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="email" className="form-label">Email</label>
+          
           <input
             type="email"
             id="email"
@@ -74,7 +87,7 @@ const SignupPage = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password" className="form-label">Password</label>
+          
           <input
             type="password"
             id="password"
@@ -87,16 +100,37 @@ const SignupPage = () => {
           />
         </div>
 
-        <div className="form-group role">
-          <label htmlFor="role" className="form-label">Role</label>
-          <label htmlFor='supervisor'>
-            <input name="role" id="supervisor" type="radio" value="Supervisor" onChange={handleInputChange}></input>
-            Supervisor</label>
-            <label htmlFor='worker'>
-            <input name="role" id="worker" type="radio" value="Worker" onChange={handleInputChange}></input>
-            Worker
-            </label>
-        </div>
+        <div className="radio-group">
+        {["Lasher", "Foreman", "Clerk", "Worker"].map((role) => (
+          <label key={role} className="radio-label">
+            <input
+              type="radio"
+              name="userRole"
+              value={role}
+              checked={selectedRole === role}
+              onChange={handleRoleChange}
+            />
+            <span className="custom-radio"></span>
+            {role}
+          </label>
+        ))}
+      </div>
+
+      <div className="radio-group">
+        {["A", "B", "C"].map((group) => (
+          <label key={group} className="radio-label">
+            <input
+              type="radio"
+              name="group"
+              value={group}
+              checked={selectedGroup === group}
+              onChange={handleGroupChange}
+            />
+            <span className="custom-radio"></span>
+            Group {group}
+          </label>
+        ))}
+      </div>
 
         <button type="submit" className="form-button">Sign Up</button>
 

@@ -1,8 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
+
+*{
+  margin: 0;
+}
 body{
   font-family: "Montserrat", serif;
   font-optical-sizing: auto;
   font-style: normal;
 
 }
+
+.active{
+  position: relative;
+}
+
+.active::before{
+  content: "";
+  position: absolute;
+  width: 110%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  background-color: aliceblue;
+  height: 4px;
+  bottom: -27px;
+  border-bottom: 1px solid #1e3a8a;
+  border-radius: 5px;
+}
+

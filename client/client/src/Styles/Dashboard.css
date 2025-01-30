@@ -1,5 +1,12 @@
+.dashboard-container{
+   width: 90%;
+   margin-inline: auto;
+   padding-top: 20px;
+}
+
 .input-section {
-    margin-top: 15px;
+    margin: 15px auto;
+    width: 90%;
   }
   
   .label {
@@ -8,13 +15,22 @@
     font-size: 16px;
     font-weight: 500;
   }
+
+  .dashboard-form{
+    margin-top: 20px;
+    background-color: whitesmoke;
+    border: 1px solid #e5e7eb;
+    width: 100%; 
+    border-radius: 5px;
+  }
   
   .input {
-    width: 100%;
-    padding: 8px;
+    width: 95%;
+    padding: 15px 2.5%;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 14px;
+    
   }
   
   .start-shift-btn {

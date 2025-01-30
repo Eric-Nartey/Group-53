@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CraneLocation from "./Crane";
-import Attendance from "./Attendance";
+
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import Swal from "sweetalert2"
@@ -180,7 +180,7 @@ axios.defaults.withCredentials = true
   useEffect(()=>{
       const getShift = async () =>{
         try{
-       const response=await axios.get("api/shift/check-shift")
+       const response= await axios.get("api/shift/check-shift")
 
        console.log(response)
         if(response.data==="Shift has started today."){
@@ -202,11 +202,11 @@ axios.defaults.withCredentials = true
     <div className="dashboard-container">
       <h2>Welcome, {user}</h2>
       <div className="shift-details">
-        <h3>Today&rsquo;s Shift: {currentShift}</h3>
-        <h4>Next Shift: {nextShift}</h4>   <h4>{tomorrow}</h4>
+        <h3 style={{marginBlock:"10px"}}>Today&rsquo;s Shift: {currentShift}</h3>
+        <h4>Next Shift: {nextShift}</h4>   
 
         {currentShift !== "Off" && (
-          <div>
+          <div className="dashboard-form">
             <div className="input-section">
               <label htmlFor="radioNumber" className="label">
                 Enter Radio Number:
@@ -236,7 +236,7 @@ axios.defaults.withCredentials = true
           </div>
         )}
 
-        {isCompleted && <button style={{padding:"6px",cursor:"not-allowed" ,marginTop:"20px"}}>Today's shift completed</button>}
+        {isCompleted && <button style={{padding:"10px",fontSize:"18px",cursor:"not-allowed" ,marginTop:"20px"}}>Today's shift completed</button>}
 
         <div style={{display:`${isCompleted===false ? "flex" : "none"}`}}>
         <button
@@ -268,7 +268,7 @@ axios.defaults.withCredentials = true
           </div>
         )}
       </div>
-      <Attendance />
+
     </div>
   );
 }

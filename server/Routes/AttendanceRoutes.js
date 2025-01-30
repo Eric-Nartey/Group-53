@@ -3,24 +3,11 @@ const router = express.Router();
 const Attendance = require('../Models/Attendance');
 const { Radio, Lxc } = require('../Models/Radio&Lxc');
 const verifyAdmin = require('../Middleware/Adminware');
+const verifyRefreshToken = require('../Middleware/Middleware');
 // Record attendance for a user
 
 
-router.post('/attendance',verifyAdmin, async (req, res) => {
-  const { user_id, shift_id,radio,lxc, date, sign_in_time } = req.body;
 
-  try {
-    const radioIndetification= await Radio.findOne({radio_number:radio})
-    if(!radioIndetification) return res.status(404).json({message:'Radio numder not found'}) 
-      const lxcIndetification= await Lxc.findOne({lxc_number:lxc})
-    if(!lxcIndetification) return res.status(404).json({message:'lxc numder not found'}) 
-    const newAttendance = new Attendance({ user_id, shift, date,sign_in_time });
-    await newAttendance.save();
-    res.status(201).json(newAttendance);
-  } catch (error) {
-    res.status(500).json({ message: 'Error recording attendance', error });
-  }
-});
 
 // Mark sign-out for attendance
 router.put('/:attendance_id',verifyAdmin, async (req, res) => {
@@ -38,5 +25,26 @@ router.put('/:attendance_id',verifyAdmin, async (req, res) => {
     res.status(500).json({ message: 'Error updating attendance', error });
   }
 });
+
+router.get('/get-attendance',verifyRefreshToken, async (req, res)=>{
+  const userId= req.user.id
+  try{
+    const attendance = await Attendance.find({userId:userId})
+    res.status(200).json(attendance)
+  }catch(error){
+    res.status(500).json({message: 'Error getting attendace', error})
+  }
+  
+})
+
+router.get('/', verifyAdmin, async (req, res) => {
+  try {
+    const attendance = await Attendance.find({}).populate('userId', 'fullname'); // Populate userId with only the username field
+    res.status(200).json(attendance);
+  } catch (error) {
+    res.status(500).json({ message: 'Error getting attendance', error });
+  }
+});
+
 
 module.exports = router;

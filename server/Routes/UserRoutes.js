@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {rateLimit} = require('express-rate-limit');
 const verifyRefreshToken = require('../Middleware/Middleware');
+const verifyAdmin = require('../Middleware/Adminware');
 require('dotenv').config()
 
 
@@ -20,8 +21,8 @@ const Limiter= rateLimit({
 
 // Create a new user (Worker/Supervisor)
 router.post('/signup',Limiter ,async (req, res) => {
-  const {fullname,email, password,role } = req.body.formData; // Destructure email and password from request body which is sent by the client
-   console.log(fullname)
+  const {fullname,email, password,selectedRole,selectedGroup } = req.body; // Destructure email and password from request body which is sent by the client
+   console.log(fullname,email, password,selectedRole,selectedGroup)
   try {
 
     const user_exist= await User.findOne({email:email})  // Find user by email from the database
@@ -30,7 +31,7 @@ router.post('/signup',Limiter ,async (req, res) => {
       return
     }
     const encryptedPassword= await bcrypt.hash(password,10)  //Encrypt the password using bcrypt
-    const newUser = new User({ fullname, email,role,password:encryptedPassword });
+    const newUser = new User({ fullname, email,role:selectedRole,group:selectedGroup,password:encryptedPassword });
     await newUser.save(); // Save the new user to the database
     res.status(200).json({message:"Sign up successfull"}); // Send a success message to the client
   } catch (error) {
@@ -88,7 +89,7 @@ router.post("/logout",async(req,res)=>{
    res.clearCookie("refreshToken").json({message:"User logged out"}) 
 })
 
-router.get('/me',verifyRefreshToken, async(req,res)=>{
+router.get('/me',verifyRefreshToken , async(req,res)=>{
   const userId = req.user.id;
   try{
     const user= await User.findById(userId)
@@ -97,5 +98,17 @@ router.get('/me',verifyRefreshToken, async(req,res)=>{
     res.status(500).json({message:"Error fetching user",error})
   }
 })
+
+router.get('/get-all-users',verifyAdmin , async(req,res)=>{
+  
+  try{
+    const users= await User.find({})
+    res.json(users)
+  }catch(error){
+    res.status(500).json({message:"Error fetching users",error})
+  }
+})
+
+
 
 module.exports = router;

@@ -34,7 +34,7 @@ const shiftRoutes =require('./Routes/ShiftRoute')
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/supervisors', supervisorRoutes);
-app.use('/api/attendances', attendanceRoutes);
+app.use('/api/attendance', attendanceRoutes);
 app.use('/api/cranes', craneRoutes);
 app.use('/api/lxcRadio', adminRoutes);
 app.use('/api/shift', shiftRoutes);

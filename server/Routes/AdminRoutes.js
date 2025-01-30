@@ -25,13 +25,14 @@ router.post('/post-lxc',verifyAdmin, async(req, res) => {
 // Route to add a new Radio
 router.post('/post-radio',verifyAdmin,async (req, res) => {
     const {radioNumber} = req.body;
-    console.log(newRadio)
+    
     try{
-        const findRadio= await Radio.findOne({lxc_number:lxcNumber})
+        const findRadio= await Radio.findOne({radio_number:radioNumber})
       if(findRadio) return res.status(400).json({message:"Radio already exist"})
-        const RadioNumber= await Radio.insertMany(radioNumber) 
+        const RadioNumber= await Radio.insertMany({radio_number:radioNumber}) 
     res.status(201).send({ message: 'New Radio added successfully', data: RadioNumber });
     }catch(error){
+        console.log(error)
         res.status(500).json({message:"Failed to add Radio",error}) 
     }
 
