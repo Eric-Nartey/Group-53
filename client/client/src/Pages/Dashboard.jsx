@@ -16,6 +16,7 @@ function Dashboard( ) {
   const [radioAssigned, setRadioAssigned] = useState(false);
   const [lxcAssigned, setLxcAssigned] = useState(false);
   const [user, setUser] = useState("")
+  const [group, setGroup] = useState("")
   const [isCompleted, setIsCompleted] = useState(false)
 
   const navigate = useNavigate();
@@ -39,13 +40,35 @@ function Dashboard( ) {
   getUsername()
 },[])
 
+
+  const getGroup = async () => {
+    
+    try {
+       const response= await axios.get("/api/users/get_group",{
+        withCredentials: true,
+      });
+       return response.data
+       
+      
+      } catch (error) {
+        console.error("Error fetching group:", error.response?.data || error.message);
+        return null; // Ensure function always returns something
+      }
+  };
+
+  
+
+
 const [tomorrow,setTomorrow]= useState("")
   // Shift rotation logic
-  const calculateShift = (group) => {
+  const calculateShift = async() => {
     const startDate = new Date("2025-01-01"); // Example start of rotation
     const currentDate = new Date();
     const tomorrowDate = new Date();
 setTomorrow(tomorrowDate.setDate(currentDate.getDate() + 1))
+try{
+let group=await getGroup()
+console.log("ur group",group)
 
     const daysSinceStart = Math.floor(
       (currentDate - startDate) / (1000 * 60 * 60 * 24)
@@ -86,14 +109,26 @@ setTomorrow(tomorrowDate.setDate(currentDate.getDate() + 1))
   }
 
     return shift;
+
+}catch(error){
+  console.log(error)
+}
 };
 
 axios.defaults.withCredentials = true
 
   useEffect(() => {
-    const shift = calculateShift("A");
-    setCurrentShift(shift.current);
-    setNextShift(shift.next);
+     
+      
+    calculateShift()
+    .then(data=> {
+      setCurrentShift(data.current)
+      setNextShift(data.next)
+    })
+    .catch(err=> console.log(err))
+    
+  
+    
   }, []);
 
   const handleRadioInput = (e) => {
@@ -222,7 +257,7 @@ axios.defaults.withCredentials = true
             </div>
             <div className="input-section">
               <label htmlFor="lxcNumber" className="label">
-                Enter LXC Number:
+                Enter LXE Number:
               </label>
               <input
                 id="lxcNumber"

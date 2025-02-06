@@ -37,10 +37,11 @@
     background-color: #2563eb;
     color: white;
     padding: 10px 15px;
-    margin-top: 15px;
+    margin-top: 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 18px;
   }
   
   .start-shift-btn:disabled {
@@ -55,8 +56,10 @@
     padding: 10px 15px;
     margin-top: 10px;
     border: none;
+    margin-left: 10px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 18px;
   }
   
   .sign-out-btn:disabled {

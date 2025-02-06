@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['Worker', 'Supervisor','Foreman','Clerk','Lasher'], required: true },
   email: { type: String, required: true, unique: true },
   group:{type:String,enum:['A','B','C'],required:true},
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  passwordResetToken:{type:String,default:null},
+  passwordResetExpiration:{type:Date ,default:null}
 });
 
 const User = mongoose.model('User', userSchema);
