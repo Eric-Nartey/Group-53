@@ -4,15 +4,19 @@ import CraneLocation from "./Crane";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import Swal from "sweetalert2"
+import { Card, Input, Button, Typography, Space, Alert,message } from "antd";
+import { CheckCircleTwoTone } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 import "../Styles/Dashboard.css";
 
 function Dashboard( ) {
   const [shiftStarted, setShiftStarted] = useState(false);
-  const [location, setLocation] = useState(null);
+  
   const [currentShift, setCurrentShift] = useState("");
   const [nextShift, setNextShift] = useState("");
   const [radioNumber, setRadioNumber] = useState("");
-  const [lxcNumber, setLxcNumber] = useState("");
+  const [lxeNumber, setLxeNumber] = useState("");
   const [radioAssigned, setRadioAssigned] = useState(false);
   const [lxcAssigned, setLxcAssigned] = useState(false);
   const [user, setUser] = useState("")
@@ -136,7 +140,7 @@ axios.defaults.withCredentials = true
   };
 
   const handleLxcInput = (e) => {
-    setLxcNumber(e.target.value);
+    setLxeNumber(e.target.value);
   };
 
   const handleStartShift = async() => {
@@ -155,7 +159,7 @@ axios.defaults.withCredentials = true
         return
     }
     
-    if (!radioNumber || !lxcNumber) {
+    if (!radioNumber) {
       Swal.fire({
         title: "Please enter both Radio and LXC numbers",
         icon: "warning",
@@ -163,7 +167,7 @@ axios.defaults.withCredentials = true
       })
       return;
     }
-    const response= await axios.post("api/shift/start-shift",{lxcNumber,radioNumber,currentShift})
+    const response= await axios.post("api/shift/start-shift",{lxeNumber,radioNumber,location: location.placeName,currentShift})
     console.log(response.data)
    
     setShiftStarted(true);
@@ -171,6 +175,9 @@ axios.defaults.withCredentials = true
     setLxcAssigned(true);
     startLocationTracking();
 }catch(error){
+  if (error.response && error.response.status === 404) {
+    message.error(error.response.data?.message || "Resource not found");
+  }
   console.log(error)
 }
 
@@ -184,6 +191,56 @@ axios.defaults.withCredentials = true
       });
     });
   };
+
+ 
+
+
+  const [location, setLocation] = useState({
+    latitude: null,
+    longitude: null,
+    placeName: null,
+    error: null,
+  });
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          setLocation((prev) => ({ ...prev, latitude: lat, longitude: lon }));
+
+          // Reverse Geocoding with Mapbox API
+          const accessToken = "pk.eyJ1IjoiYWt1YWZvLTEiLCJhIjoiY200MXhxNnJrMDQzNjJrcjAzbXg4cTliMCJ9.6cwG6dff4E2UjnQz7q963A";
+          try {
+            const response = await fetch(
+              `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${accessToken}`
+            );
+            const data = await response.json();
+            if (data.features.length > 0) {
+              setLocation((prev) => ({ ...prev, placeName: data.features[0].place_name }));
+            } else {
+              setLocation((prev) => ({ ...prev, placeName: "Location not found" }));
+            }
+          } catch (error) {
+            setLocation((prev) => ({ ...prev, error: "Failed to fetch location name" }));
+          }
+        },
+        (error) => {
+          setLocation((prev) => ({ ...prev, error: error.message }));
+        }
+      );
+    } else {
+      setLocation((prev) => ({ ...prev, error: "Geolocation is not supported" }));
+    }
+  }, []);
+
+  
+  
+  
+
+
+
 
   const handleSignOut = async() => {
     if (!shiftStarted) {
@@ -212,6 +269,24 @@ axios.defaults.withCredentials = true
   }
   };
 
+
+  useEffect(() => {
+    const checkTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+
+      if ((hours === 18 && minutes === 30) || (hours === 7 && minutes === 30) && shiftStarted && currentShift==="Morning" || currentShift==="Evening") { // 6:30 PM
+        handleSignOut()
+      }
+      
+    };
+
+    const interval = setInterval(checkTime, 60000); // Check every minute
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
   useEffect(()=>{
       const getShift = async () =>{
         try{
@@ -234,76 +309,67 @@ axios.defaults.withCredentials = true
   },[])
 
   return (
-    <div className="dashboard-container">
-      <h2>Welcome, {user}</h2>
-      <div className="shift-details">
-        <h3 style={{marginBlock:"10px"}}>Today&rsquo;s Shift: {currentShift}</h3>
-        <h4>Next Shift: {nextShift}</h4>   
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px" }}>
+     <div>{location.placeName}</div>
+      <Card>
+        <Title level={3}>Welcome, {user}</Title>
+        <Text strong>Today's Shift:</Text> <Text>{currentShift}</Text>
+        <br />
+        <Text strong>Next Shift:</Text> <Text>{nextShift}</Text>
+      </Card>
+      
+      {currentShift !== "Off" && (
+        <Card style={{ marginTop: 20 }}>
+          <Title level={4}>Enter Equipment Details</Title>
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Input
+              placeholder="Enter Radio Number"
+              value={radioNumber}
+              onChange={handleRadioInput}
+              disabled={shiftStarted}
+            />
+            <Input
+              placeholder="Enter LXE Number"
+              value={lxeNumber}
+              onChange={handleLxcInput}
+              disabled={shiftStarted}
+            />
+          </Space>
+        </Card>
+      )}
 
-        {currentShift !== "Off" && (
-          <div className="dashboard-form">
-            <div className="input-section">
-              <label htmlFor="radioNumber" className="label">
-                Enter Radio Number:
-              </label>
-              <input
-                id="radioNumber"
-                type="text"
-                value={radioNumber}
-                onChange={handleRadioInput}
-                className="input"
-                disabled={shiftStarted}
-              />
-            </div>
-            <div className="input-section">
-              <label htmlFor="lxcNumber" className="label">
-                Enter LXE Number:
-              </label>
-              <input
-                id="lxcNumber"
-                type="text"
-                value={lxcNumber}
-                onChange={handleLxcInput}
-                className="input"
-                disabled={shiftStarted}
-              />
-            </div>
-          </div>
-        )}
+      {isCompleted ? (
+        <Alert
+          message="Today's shift completed"
+          type="success"
+          showIcon
+          icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+          style={{ marginTop: 20 }}
+        />
+      ) : (
+        <Space style={{ marginTop: 20 }}>
+          <Button
+            type="primary"
+            onClick={handleStartShift}
+            disabled={currentShift === "Off" || shiftStarted || (radioAssigned && lxcAssigned)}
+          >
+            {currentShift === "Off" ? "No Shift Today" : "Start Shift"}
+          </Button>
+          <Button type="default" danger onClick={handleSignOut} disabled={!shiftStarted}>
+            Sign Out
+          </Button>
+        </Space>
+      )}
 
-        {isCompleted && <button style={{padding:"10px",fontSize:"18px",cursor:"not-allowed" ,marginTop:"20px"}}>Today's shift completed</button>}
-
-        <div style={{display:`${isCompleted===false ? "flex" : "none"}`}}>
-        <button
-          onClick={handleStartShift}
-          className="start-shift-btn"
-          disabled={currentShift === "Off" || shiftStarted || (radioAssigned && lxcAssigned)}
-        >
-          {currentShift === "Off" ? "No Shift Today" : "Start Shift"}
-        </button>
-
-        
-
-        <button
-          onClick={handleSignOut}
-          className="sign-out-btn"
-          disabled={!shiftStarted}
-        >
-          Sign Out
-        </button>
-        </div>
-
-
-        {shiftStarted && location && (
-          <div className="location-tracking">
-            <p>
-              Current Crane Location: {location.latitude}, {location.longitude}
-            </p>
-            <CraneLocation location={location} />
-          </div>
-        )}
-      </div>
-
+      {shiftStarted && location && (
+        <Card style={{ marginTop: 20 }}>
+          <Text strong>Current Crane Location:</Text>
+          <Text>
+            {location.latitude}, {location.longitude}
+          </Text>
+          <CraneLocation location={location} />
+        </Card>
+      )}
     </div>
   );
 }

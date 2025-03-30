@@ -22,9 +22,9 @@ const Limiter= rateLimit({
 })
 
 // Create a new user (Worker/Supervisor)
-router.post('/signup',Limiter ,async (req, res) => {
-  const {fullname,email, password,selectedRole,selectedGroup } = req.body; // Destructure email and password from request body which is sent by the client
-   console.log(fullname,email, password,selectedRole,selectedGroup)
+router.post('/signup', async (req, res) => {
+  const {fullname,email, password,role,group } = req.body; // Destructure email and password from request body which is sent by the client
+   console.log(fullname,email, password,role,group)
   try {
 
     const user_exist= await User.findOne({email:email})  // Find user by email from the database
@@ -33,10 +33,11 @@ router.post('/signup',Limiter ,async (req, res) => {
       return
     }
     const encryptedPassword= await bcrypt.hash(password,10)  //Encrypt the password using bcrypt
-    const newUser = new User({ fullname, email,role:selectedRole,group:selectedGroup,password:encryptedPassword });
+    const newUser = new User({ fullname, email,role,group,password:encryptedPassword });
     await newUser.save(); // Save the new user to the database
     res.status(200).json({message:"Sign up successfull"}); // Send a success message to the client
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error creating user', error });
   }
 });
@@ -66,13 +67,14 @@ router.post('/login', Limiter,async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24
 }); // Set the refresh token as a cookie and send to the client browser
 
-if(findUser.role==="Supervisor"){
+if(findUser.role==="Admin"){
     res.status(200).json({message:"supervisor logged in "}) // Return a success message
 }else{
     res.status(201).json({message:"Worker logged in "})
 }
   } catch (error) {
     res.status(500).json({ message: 'Error creating user', error });
+    console.log(error)
   }
 });
 

@@ -15,6 +15,7 @@ router.put('/:attendance_id',verifyAdmin, async (req, res) => {
   const { sign_out_time } = req.body;
 
   try {
+    
     const attendance = await Attendance.findByIdAndUpdate(
       attendance_id,
       { sign_out_time },

@@ -24,18 +24,18 @@ app.use(cors({
 // Import routes
 const authRoutes = require('./Routes/AuthRoutes');
 const userRoutes = require('./Routes/UserRoutes');
-const supervisorRoutes = require('./Routes/SupervisorRoutes');
+
 const attendanceRoutes = require('./Routes/AttendanceRoutes');
-const craneRoutes = require('./Routes/CraneRoutes');
+
 const adminRoutes = require('./Routes/AdminRoutes');
 const shiftRoutes =require('./Routes/ShiftRoute')
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/supervisors', supervisorRoutes);
+
 app.use('/api/attendance', attendanceRoutes);
-app.use('/api/cranes', craneRoutes);
+
 app.use('/api/lxcRadio', adminRoutes);
 app.use('/api/shift', shiftRoutes);
 

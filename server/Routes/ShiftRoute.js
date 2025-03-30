@@ -2,11 +2,11 @@ const express = require("express")
 const router = express.Router()
 const Attendance = require("../Models/Attendance");
 const verifyRefreshToken = require("../Middleware/Middleware");
-
+const { Radio, Lxc } = require('../Models/Radio&Lxc');
 
 
 router.post("/start-shift", verifyRefreshToken, async (req, res) => {
-    const { currentShift } = req.body;
+    const { currentShift,lxeNumber,radioNumber,location } = req.body;
     const userId = req.user?.id;
 
     console.log("Request Body:", req.body);
@@ -17,6 +17,47 @@ router.post("/start-shift", verifyRefreshToken, async (req, res) => {
     }
 
     try {
+
+        const find_radio= await Radio.findOne({radio_number: radioNumber})
+    
+    if(!find_radio){
+        console.log("radio not found")
+      return res.status(404).json({message:"You enter a wrong radio"})
+    }
+    let find_lxe ;
+    if (lxeNumber !== "") { 
+        console.log(lxeNumber)
+         find_lxe = await Lxc.findOne({ lxc_number: lxeNumber});
+        console.log("find",find_lxe)
+        if (!find_lxe) {
+          console.log("LXE not found");
+          return res.status(404).json({ message: "You entered a wrong LXE" });
+        }
+      }
+
+      const startOfDay = new Date();
+        startOfDay.setUTCHours(0, 0, 0, 0); // Start of today in UTC
+
+        const endOfDay = new Date();
+        endOfDay.setUTCHours(23, 59, 59, 999); // End of today in UTC
+
+      
+      const attendance = await Attendance.findOne({
+        $or: [
+          { radio_number: radioNumber },
+          { lxc_number: lxeNumber }
+        ],
+        sign_out_time: null,
+        createdAt: { $gte: startOfDay, $lte: endOfDay } // Ensure createdAt is today
+      });
+  
+      if (attendance) {
+        console.log("Radio or LXE exists and has not signed out:", attendance);
+       return res.status(400).json({message: "Radio or LXE exists and has not signed out"})
+      } else {
+        console.log("No matching record found or the user has already signed out.");
+      }
+      
         // Check if the user is already on a shift
         console.log("Checking if user is already on a shift...");
         const existingShift = await Attendance.findOne({ userId, sign_out_time: null });
@@ -29,6 +70,9 @@ router.post("/start-shift", verifyRefreshToken, async (req, res) => {
         // Create a new shift
         const newShiftData = {
             userId,
+            lxc_id: find_lxe._id,
+            radio_id: find_radio._id,
+            location,
             shiftType: currentShift,
             sign_in_time: new Date(),
             shift: "Started",

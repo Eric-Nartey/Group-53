@@ -16,7 +16,7 @@ const verifyAdmin = (req, res, next) => {
     if (decoded.exp * 1000 < Date.now()) {
       return res.status(401).json({ message: 'Refresh token expired' });
     }
-    if(decoded.role !== "Supervisor"){
+    if(decoded.role !== "Admin"){
         return res.status(405).json({ message: 'You are not authorized to access this route'})
     }
         // Attach decoded data to the request object
