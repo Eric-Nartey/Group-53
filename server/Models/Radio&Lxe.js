@@ -7,11 +7,11 @@ const radioSchema = new Schema({
 });
 
 
- const LxcSchema = new Schema({
- lxc_number: {type: String},
+ const LxeSchema = new Schema({
+ lxe_number: {type: String},
 
 });
-const Lxc = model('Lxc', LxcSchema);
+const Lxe = model('Lxe', LxeSchema);
 const Radio = model('Radio', radioSchema);
 
-module.exports = {Lxc, Radio}
+module.exports = {Lxe, Radio}

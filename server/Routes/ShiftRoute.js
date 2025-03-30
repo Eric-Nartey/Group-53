@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 const Attendance = require("../Models/Attendance");
 const verifyRefreshToken = require("../Middleware/Middleware");
-const { Radio, Lxc } = require('../Models/Radio&Lxc');
+const { Radio, Lxe } = require('../Models/Radio&Lxe');
 
 
 router.post("/start-shift", verifyRefreshToken, async (req, res) => {
@@ -27,7 +27,7 @@ router.post("/start-shift", verifyRefreshToken, async (req, res) => {
     let find_lxe ;
     if (lxeNumber !== "") { 
         console.log(lxeNumber)
-         find_lxe = await Lxc.findOne({ lxc_number: lxeNumber});
+         find_lxe = await Lxe.findOne({ lxe_number: lxeNumber});
         console.log("find",find_lxe)
         if (!find_lxe) {
           console.log("LXE not found");
@@ -45,11 +45,12 @@ router.post("/start-shift", verifyRefreshToken, async (req, res) => {
       const attendance = await Attendance.findOne({
         $or: [
           { radio_number: radioNumber },
-          { lxc_number: lxeNumber }
+          { lxe_number: lxeNumber }
         ],
         sign_out_time: null,
         createdAt: { $gte: startOfDay, $lte: endOfDay } // Ensure createdAt is today
       });
+      console.log("Attendance Record:", attendance);
   
       if (attendance) {
         console.log("Radio or LXE exists and has not signed out:", attendance);
@@ -70,7 +71,7 @@ router.post("/start-shift", verifyRefreshToken, async (req, res) => {
         // Create a new shift
         const newShiftData = {
             userId,
-            lxc_id: find_lxe._id,
+            Lxe_id: find_lxe._id,
             radio_id: find_radio._id,
             location,
             shiftType: currentShift,

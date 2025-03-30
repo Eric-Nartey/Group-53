@@ -1,18 +1,18 @@
 const express = require('express');
-const { Lxc, Radio } = require('../Models/Radio&Lxc');
+const { Lxe, Radio } = require('../Models/Radio&Lxe');
 const verifyAdmin = require('../Middleware/Adminware');
 
 const router = express.Router();
 
 // Route to add a new LXC
-router.post('/post-lxc',verifyAdmin, async(req, res) => {
-    const {lxcNumber} = req.body;
-    console.log(lxcNumber)
+router.post('/post-lxe',verifyAdmin, async(req, res) => {
+    const {lxeNumber} = req.body;
+    console.log(lxeNumber)
     try{
-      const findLxc= await Lxc.findOne({lxc_number:lxcNumber})
-      if(findLxc) return res.status(400).json({message:"LXC already exist"})
-      const LxcNumber= await Lxc.insertMany({lxc_number:lxcNumber}) 
-    res.status(201).send({ message: 'New LXC added successfully', data: LxcNumber });
+      const findLxe= await Lxe.findOne({lxe_number:lxeNumber})
+      if(findLxe) return res.status(400).json({message:"LXC already exist"})
+      const LxeNumber= await Lxe.insertMany({lxe_number:lxeNumber}) 
+    res.status(201).send({ message: 'New LXC added successfully', data: LxeNumber });
 
     }catch(error){
         res.status(500).json({message:"Failed to add LXC",error})
@@ -20,7 +20,24 @@ router.post('/post-lxc',verifyAdmin, async(req, res) => {
     
 });
 
-
+router.delete("/lxe/:id",verifyAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // Check if LXE exists
+      const lxe = await Lxe.findById(id);
+      if (!lxe) {
+        return res.status(404).json({ message: "LXE not found" });
+      }
+  
+      // Delete the LXE
+      await Lxe.findByIdAndDelete(id);
+      res.status(200).json({ message: "LXE deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting LXE:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
 // Route to add a new Radio
 router.post('/post-radio',verifyAdmin,async (req, res) => {
@@ -38,16 +55,35 @@ router.post('/post-radio',verifyAdmin,async (req, res) => {
 
 });
 
+router.delete("/radio/:id",verifyAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // Check if LXE exists
+      const lxe = await Radio.findById(id);
+      if (!lxe) {
+        return res.status(404).json({ message: "Radio not found" });
+      }
+  
+      // Delete the LXE
+      await Radio.findByIdAndDelete(id);
+      res.status(200).json({ message: "Radio deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting Radio:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
-router.get('/get-lxcs',verifyAdmin, async(req, res) => {
+
+router.get('/get-lxes',verifyAdmin, async(req, res) => {
     
     try{
 
-      const lxcNumber= await Lxc.find({}) 
-    res.json(lxcNumber);
+      const lxeNumber= await Lxe.find({}) 
+    res.json(lxeNumber);
 
     }catch(error){
-        res.status(500).json({message:"Failed to add LXC",error})
+        res.status(500).json({message:"Failed to add LXE",error})
     }
     
 });
@@ -60,7 +96,7 @@ router.get('/get-radios',verifyAdmin, async(req, res) => {
       res.json(radioNumber);
 
     }catch(error){
-        res.status(500).json({message:"Failed to add LXC",error})
+        res.status(500).json({message:"Failed to add Radio",error})
     }
     
 });

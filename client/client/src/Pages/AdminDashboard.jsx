@@ -1,25 +1,29 @@
 import React, { useState, useEffect,useRef } from 'react';
 import axios from "../api/api";
 import Swal from 'sweetalert2'
-import { Layout,Select, Menu, Button, Table, Tabs, Modal, Input, Card, Typography, Space, message } from "antd";
-import { UserOutlined, LogoutOutlined, PlusOutlined } from "@ant-design/icons";
-
+import { format } from "date-fns";
+import { Layout,Select,Input, Menu, Button,Tooltip, Table, Tabs, Modal, Card, Typography, Space, message } from "antd";
+import { UserOutlined, LogoutOutlined, PlusOutlined,BarChartOutlined, DeleteOutlined  } from "@ant-design/icons";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip } from "recharts";
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 import '../Styles/AdminDashboard.css';
 import {useNavigate} from 'react-router-dom'
+import useLogout from '../Hooks/Logout';
+
 
 const AdminDashboard = () => {
+  const { Search } = Input;
     const [users, setUsers] = useState([]);
     const [newUser, setNewUser] = useState({ fullname:'', email: '', password:'',role:'',group:'' });
     const [newRadio, setNewRadio] = useState("");
-    const [newLxc, setNewLxc] = useState("");
+    const [newLxe, setNewLxe] = useState("");
     const [attendance, setAttendance] = useState([]);
     const [isOpen, setIsOpen] = useState(false)
     const [isOpen1, setIsOpen1] = useState(false)
     const [isOpen2, setIsOpen2] = useState(false)
-    const [lxc,setLxc] = useState([])
+    const [lxe,setLxe] = useState([])
     const [radio,setRadio] = useState([])
     const [user,setUser]=useState("")
     const popupRef = useRef(null);
@@ -27,10 +31,12 @@ const AdminDashboard = () => {
     const popupRef2 = useRef(null);
     
     const [isUserModalOpen, setUserModalOpen] = useState(false);
-  const [isLxcModalOpen, setLxcModalOpen] = useState(false);
+  const [isLxeModalOpen, setLxeModalOpen] = useState(false);
   const [isRadioModalOpen, setRadioModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
 
+
+  const logout = useLogout();
     axios.defaults.withCredentials= true
     
   // Fetch the login users name on every page refresh
@@ -56,7 +62,7 @@ const AdminDashboard = () => {
     function toggleAddUser(){
         setIsOpen(!isOpen)
     }
-    function toggleAddLXC(){
+    function toggleAddLXE(){
         setIsOpen1(!isOpen1)
     }
 
@@ -64,7 +70,12 @@ const AdminDashboard = () => {
         setIsOpen2(!isOpen2)
     }
 
+    const [searchTerm, setSearchTerm] = useState("");
 
+    // Filter attendance based on the search term
+    const filteredAttendance = attendance.filter((record) =>
+      record.userId.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     // fetch attendance data
     const fetchAttendance = async () => {
         try{
@@ -75,7 +86,69 @@ const AdminDashboard = () => {
             console.log(error)
         }
     };
-    
+
+    const deleteAttendance = async (record) => {
+        try {
+            const response = await axios.delete(`/api/attendance/${record._id}`);
+            if (response.status === 200) {
+              setAttendance(prev=> prev.filter(item => item._id !== record._id)); // Remove deleted record from state
+                message.success("Attendance record deleted successfully!");
+                fetchAttendance(); // Refresh attendance data after deletion
+            } else {
+                message.error("Failed to delete attendance record.");
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+      }
+
+
+      const deleteUser = async (record) => {
+        try {
+            const response = await axios.delete(`/api/users/${record._id}`);
+            if (response.status === 200) {
+              setUsers(prev=> prev.filter(item => item._id !== record._id)); // Remove deleted record from state
+                message.success("User deleted successfully!");
+                getAllusers(); // Refresh user data after deletion
+            } else {
+                message.error("Failed to delete user.");
+            }
+        }catch(error){
+            console.log(error)
+        }
+      }
+
+      const deleteLxe = async (record) => {
+        try {
+            const response = await axios.delete(`/api/lxeRadio/lxe/${record._id}`);
+            if (response.status === 200) {
+              setLxe(prev=> prev.filter(item => item._id !== record._id)); // Remove deleted record from state
+                message.success("LXE deleted successfully!");
+                getLxe(); // Refresh user data after deletion
+            } else {
+                message.error("Failed to delete LXE.");
+            }
+        }catch(error){
+            console.log(error)
+        }
+      }
+
+      const deleteRadio = async (record) => {
+        try {
+            const response = await axios.delete(`/api/lxeRadio/radio/${record._id}`);
+            if (response.status === 200) {
+              setRadio(prev=> prev.filter(item => item._id !== record._id)); // Remove deleted record from state
+                message.success("Radio deleted successfully!");
+                getRadio(); // Refresh user data after deletion
+            } else {
+                message.error("Failed to delete Radio.");
+            }
+        }catch(error){
+            console.log(error)
+        }
+      }
+
     // fetch all user information
     const getAllusers = async () => {
         try{
@@ -89,10 +162,10 @@ const AdminDashboard = () => {
 
     // Function to get all LXE only executes when it is called
     const navigate = useNavigate()
-    const getLxc = async () => {
+    const getLxe = async () => {
     try{
-        const response = await axios.get('/api/lxcRadio/get-lxcs');
-        setLxc(response.data)
+        const response = await axios.get('/api/lxeRadio/get-lxes');
+        setLxe(response.data)
         console.log(response.data)
     }catch(error){
         console.log(error)
@@ -103,8 +176,9 @@ const AdminDashboard = () => {
     // Function to get all radio only executes when it is called
     const getRadio = async () => {
         try{
-        const response = await axios.get('/api/lxcRadio/get-radios');
+        const response = await axios.get('/api/lxeRadio/get-radios');
         console.log(response.data)
+        setRadio(response.data)
         }catch(error){
             console.log(error)
             if(error.status===405){
@@ -121,7 +195,7 @@ const AdminDashboard = () => {
 
     // Fetch all the data once the page is refreshed
     useEffect(()=>{
-        getLxc()
+        getLxe()
         getRadio()
         getAllusers()
         fetchAttendance()
@@ -131,7 +205,7 @@ const AdminDashboard = () => {
     //function to add a new radio
     const postRadio = async () => {
         try{
-        const response= await axios.post('/api/lxcRadio/post-radio',{radioNumber:newRadio});
+        const response= await axios.post('/api/lxeRadio/post-radio',{radioNumber:newRadio});
         const Data= response.data.data;
         setRadio(prevData => [...Data,...prevData])
         console.log(response.data)
@@ -143,19 +217,49 @@ const AdminDashboard = () => {
 
 
     //Function to add a new LXE
-    const postLxc = async () => {
+    const postLxe = async () => {
         try{
-        const response=await axios.post('/api/lxcRadio/post-lxc',{lxcNumber:newLxc});
+        const response=await axios.post('/api/lxeRadio/post-lxe',{lxeNumber:newLxe});
          
          const Data=response.data.data
-         setLxc(prevData => [...Data,...prevData])
+         setLxe(prevData => [...Data,...prevData])
         }catch(error){
             console.log(error)
         }
     };
 
-    
-    
+    const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [analyticsData, setAnalyticsData] = useState({ fullname: "", chartData: [] });
+
+  const handleAnalytics = (fullname) => {
+    // Filter user attendance records
+    const userAttendance = attendance.filter(
+      (record) => record.userId.fullname === fullname
+    );
+  
+    // Group sign-ins by month
+    const monthlySignIns = userAttendance.reduce((acc, entry) => {
+      if (!entry.sign_in_time) return acc;
+  
+      const month = format(new Date(entry.sign_in_time), "MMMM yyyy"); // Example: "March 2025"
+      acc[month] = (acc[month] || 0) + 1;
+  
+      return acc;
+    }, {});
+  
+    // Convert to chart data format
+    const chartData = Object.entries(monthlySignIns).map(([month, count]) => ({
+      month,
+      signIn: count,
+    }));
+  
+    // Set modal data & show modal
+    setAnalyticsData({ fullname, chartData });
+    setIsModalVisible(true);
+  };
+  
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -220,37 +324,148 @@ useEffect(() => {
           <Space>
             <Text style={{ color: "white" }}>{user}</Text>
             <Button shape="circle" icon={<UserOutlined />} />
-            <Button icon={<LogoutOutlined />} danger>Logout</Button>
+            <Button icon={<LogoutOutlined />} onClick={logout} danger>Logout</Button>
           </Space>
         </Header>
   
         <Layout>
-          <Sider width={200} className="side" style={{ background: "#fff" }}>
+          <Sider width={200} className="side" style={{ background: "#fff",paddingTop:"30px" }}>
             <Menu mode="inline" selectedKeys={[activeTab]} className="side" onClick={(e) => setActiveTab(e.key)}>
               <Menu.Item key="1">Attendance</Menu.Item>
               <Menu.Item key="2">Users</Menu.Item>
               <Menu.Item key="3">Radio</Menu.Item>
-              <Menu.Item key="4">LXC</Menu.Item>
+              <Menu.Item key="4">LXE</Menu.Item>
             </Menu>
           </Sider>
   
+
+      
           <Layout style={{ padding: "24px" }}>
+         
             <Content>
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
+              
                 <TabPane tab="Attendance" key="1">
-                  <Table dataSource={attendance} columns={[{ title: "Name", dataIndex: "userId.fullname" }, { title: "Session", dataIndex: "shiftType" }, { title: "Sign in", dataIndex: "sign_in_time" }, { title: "Sign out", dataIndex: "sign_out_time" }]} />
+                 {/* Search Bar */}
+      <Search
+        placeholder="Search by Fullname"
+        allowClear
+        enterButton="Search"
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: 16, width: 300 }}
+      />
+                <Table
+  dataSource={filteredAttendance}
+  columns={[
+    { title: "Name", dataIndex: ["userId", "fullname"], key: "name" },
+    { title: "Session", dataIndex: "shiftType", key: "session" },
+    { title: "Location", dataIndex: "location", key: "location" },
+    {
+      title: "Sign in",
+      dataIndex: "sign_in_time",
+      key: "signIn",
+      render: (text) =>
+        text ? format(new Date(text), "MMMM d, yyyy h:mm a") : "-",
+    },
+    {
+      title: "Sign out",
+      dataIndex: "sign_out_time",
+      key: "signOut",
+      render: (text) =>
+        text ? format(new Date(text), "MMMM d, yyyy h:mm a") : "-",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Tooltip title="View Analytics">
+            <Button
+              type="primary"
+              icon={<BarChartOutlined />}
+              onClick={() => handleAnalytics(record.userId.fullname)}
+            />
+          </Tooltip>
+          <Tooltip title="Delete Record">
+            <Button
+              type="danger"
+              icon={<DeleteOutlined />}
+              onClick={() => deleteAttendance(record)}
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ]}
+/>
                 </TabPane>
                 <TabPane tab="Users" key="2">
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setUserModalOpen(true)}>Add User</Button>
-                  <Table dataSource={users} columns={[{ title: "Name", dataIndex: "fullname" }, { title: "Email", dataIndex: "email" }, { title: "Role", dataIndex: "role" }]} />
+                  <Table
+  dataSource={users}
+  columns={[
+    { title: "Name", dataIndex: "fullname", key: "fullname" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Role", dataIndex: "role", key: "role" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Tooltip title="Delete User">
+          <Button
+            type="danger"
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(record)}
+          />
+        </Tooltip>
+      ),
+    },
+  ]}
+/>
                 </TabPane>
                 <TabPane tab="Radio" key="3">
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setRadioModalOpen(true)}>Add Radio</Button>
-                  <Table dataSource={radio} columns={[{ title: "Radio Number", dataIndex: "radio_number" }]} />
+                  <Table
+  dataSource={radio}
+  columns={[
+    { title: "Radio Number", dataIndex: "radio_number", key: "radio_number" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Tooltip title="Delete Radio">
+          <Button
+            type="danger"
+            icon={<DeleteOutlined />}
+            onClick={() => deleteRadio(record)}
+          />
+        </Tooltip>
+      ),
+    },
+  ]}
+/>
                 </TabPane>
-                <TabPane tab="LXC" key="4">
-                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setLxcModalOpen(true)}>Add LXC</Button>
-                  <Table dataSource={lxc} columns={[{ title: "LXC Number", dataIndex: "lxc_number" }]} />
+                <TabPane tab="LXE" key="4">
+                  <Button type="primary" icon={<PlusOutlined />} onClick={() => setLxeModalOpen(true)}>Add LXE</Button>
+                  <Table
+  dataSource={lxe}
+  columns={[
+    { title: "LXE Number", dataIndex: "lxe_number", key: "lxe_number" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Tooltip title="Delete LXE">
+          <Button
+            type="danger"
+            icon={<DeleteOutlined />}
+            onClick={() => deleteLxe(record)}
+          />
+        </Tooltip>
+      ),
+    },
+  ]}
+/>
                 </TabPane>
               </Tabs>
             </Content>
@@ -278,13 +493,33 @@ useEffect(() => {
   </Select>
 
   <Button type="primary" block onClick={handleAddUser}>Add User</Button>
+
+  
+</Modal>
+
+{/* Analytics Modal */}
+<Modal
+  title={`Attendance Analytics - ${analyticsData.fullname}`}
+  open={isModalVisible}
+  onCancel={() => setIsModalVisible(false)}
+  footer={null}
+  width={600}
+>
+  <ResponsiveContainer width="100%" height={300}>
+    <BarChart data={analyticsData.chartData}>
+      <XAxis dataKey="month" />
+      <YAxis allowDecimals={false} />
+      <RechartsTooltip />
+      <Bar dataKey="signIn" fill="#1890ff" barSize={40} />
+    </BarChart>
+  </ResponsiveContainer>
 </Modal>
 
   
-        {/* Add LXC Modal */}
-        <Modal title="Add LXC" visible={isLxcModalOpen} onCancel={() => setLxcModalOpen(false)} footer={null}>
-          <Input placeholder="LXC Number" value={newLxc} onChange={(e)=> setNewLxc(e.target.value)} style={{ marginBottom: 10 }} />
-          <Button type="primary" block onClick={postLxc}>>Add LXC</Button>
+        {/* Add LXE Modal */}
+        <Modal title="Add LXE" visible={isLxeModalOpen} onCancel={() => setLxeModalOpen(false)} footer={null}>
+          <Input placeholder="LXE Number" value={newLxe} onChange={(e)=> setNewLxe(e.target.value)} style={{ marginBottom: 10 }} />
+          <Button type="primary" block onClick={postLxe}>>Add LXE</Button>
         </Modal>
   
         {/* Add Radio Modal */}

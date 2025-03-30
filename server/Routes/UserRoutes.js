@@ -78,6 +78,11 @@ if(findUser.role==="Admin"){
   }
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "strict" });
+  return res.status(200).json({ message: "Logged out successfully" });
+});
+
 // Get all users
 router.get('/', async (req, res) => {
   try {
@@ -200,6 +205,26 @@ router.post('/reset-password', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong, please try again' });
+  }
+});
+
+// DELETE /api/users/:id - Delete a user by ID
+router.delete("/:id",verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if the user exists
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Delete the user
+    await User.findByIdAndDelete(id);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

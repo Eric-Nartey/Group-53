@@ -36,7 +36,7 @@ app.use('/api/users', userRoutes);
 
 app.use('/api/attendance', attendanceRoutes);
 
-app.use('/api/lxcRadio', adminRoutes);
+app.use('/api/lxeRadio', adminRoutes);
 app.use('/api/shift', shiftRoutes);
 
 
