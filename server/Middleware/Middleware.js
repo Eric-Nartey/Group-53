@@ -16,9 +16,13 @@ const verifyRefreshToken = (req, res, next) => {
     if (decoded.exp * 1000 < Date.now()) {
       return res.status(401).json({ message: 'Refresh token expired' });
     }
-
+    if (decoded.role === 'Clerk') {
+      req.isClerk = true; 
+    }
     // Attach decoded data to the request object
     req.user = decoded;
+
+
     
     
     next(); // Proceed to the next middleware

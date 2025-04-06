@@ -13,7 +13,7 @@ require('dotenv').config()
 
 const Limiter= rateLimit({
 	windowMs: 10 * 60 * 1000, // 15 minutes
-	limit: 5, // Limit each IP to 3 requests per `window` (here, per 5 minutes).
+	limit: 20, // Limit each IP to 3 requests per `window` (here, per 5 minutes).
     message: { message: 'Too many attempts, please try again after 10 minutes.' },
     statusCode: 429, // Status code to send when rate limit is exceeded
 	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
@@ -98,13 +98,22 @@ router.post("/logout",async(req,res)=>{
    res.clearCookie("refreshToken").json({message:"User logged out"}) 
 })
 
+
+
+
+
+
 router.get('/me',verifyRefreshToken , async(req,res)=>{
   const userId = req.user.id;
   try{
     const user= await User.findById(userId)
-    res.json(user.fullname)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+     return res.status(200).json(user.fullname)
   }catch(error){
-    res.status(500).json({message:"Error fetching user",error})
+    console.log(error,"me error")
+    return res.status(500).json({message:"Error fetching user",error})
   }
 })
 
@@ -239,23 +248,31 @@ router.get('/get-all-users',verifyAdmin , async(req,res)=>{
   }
 })
 
-router.get("/get_group",verifyRefreshToken,async(req,res)=>{
-  const  userId  = req.user.id;
-  const userAgent = req.headers['user-agent']; // Get user-agent header
-  console.log({ userAgent });
+router.get("/get_group", verifyRefreshToken, async (req, res) => {
+  const userId = req.user.id;
+  const clerk= req.isClerk
+ 
+
   try {
-    const user = await User.findById(userId).select('group'); // Select only the group field
+    const user = await User.findById(userId) // Select only the group field
+    console.log(userId)
+    console.log(user)
     if (!user) {
       console.log('User not found');
-      return null;
+      return res.status(404).json({ message: "User not found" }); // Properly end response
     }
+
     console.log('User group:', user.group);
-    return res.json(user.group);
+    return res.status(200).json({ group: user.group,clerk:clerk }); // Better to wrap in an object
   } catch (error) {
     console.error('Error fetching user group:', error);
-    throw error;
+    
+    // Only send error response if headers haven't been sent yet
+    
+      return res.status(500).json({ message: "Error fetching user group" });
+    
   }
-})
+});
 
 
 

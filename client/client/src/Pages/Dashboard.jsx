@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import CraneLocation from "./Crane";
+import  { useState, useEffect } from "react";
+
 
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import Swal from "sweetalert2"
-import { Card, Input, Button, Typography, Space, Alert,message } from "antd";
+import { Card, Input, Button, Typography, Space, Alert,message,Modal, Row, Col } from "antd";
 import { CheckCircleTwoTone } from "@ant-design/icons";
-
+import moment from "moment";
 const { Title, Text } = Typography;
 import "../Styles/Dashboard.css";
 
@@ -20,10 +20,11 @@ function Dashboard( ) {
   const [radioAssigned, setRadioAssigned] = useState(false);
   const [lxcAssigned, setLxcAssigned] = useState(false);
   const [user, setUser] = useState("")
-  const [group, setGroup] = useState("")
+  
   const [isCompleted, setIsCompleted] = useState(false)
 
   const navigate = useNavigate();
+  axios.defaults.withCredentials = true
 
 
   useEffect(()=>{
@@ -31,10 +32,11 @@ function Dashboard( ) {
   const getUsername = async () => {
     
     try {
-       const response= await axios.get("/api/users/me",{
-        withCredentials: true,
-      });
-       setUser(response.data)
+       const response= await axios.get("/api/users/me");
+       if(response.status===200){
+        setUser(response.data)
+       }
+       
       
     } catch (error) {
      
@@ -51,8 +53,13 @@ function Dashboard( ) {
        const response= await axios.get("/api/users/get_group",{
         withCredentials: true,
       });
-       return response.data
-       
+     
+      if(response.status===200){
+        console.log("clerk",response.data.clerk)
+        setDisabledLxe(response.data.clerk)
+       return response.data.group
+      
+      }
       
       } catch (error) {
         console.error("Error fetching group:", error.response?.data || error.message);
@@ -63,24 +70,27 @@ function Dashboard( ) {
   
 
 
-const [tomorrow,setTomorrow]= useState("")
-  // Shift rotation logic
-  const calculateShift = async() => {
-    const startDate = new Date("2025-01-01"); // Example start of rotation
+  const [tomorrow, setTomorrow] = useState("");
+  
+  
+  // Determine shift based on group and day rotation
+  const calculateShift = async () => {
+    const startDate = new Date("2025-01-01");
     const currentDate = new Date();
     const tomorrowDate = new Date();
-setTomorrow(tomorrowDate.setDate(currentDate.getDate() + 1))
-try{
-let group=await getGroup()
-console.log("ur group",group)
-
-    const daysSinceStart = Math.floor(
-      (currentDate - startDate) / (1000 * 60 * 60 * 24)
-    );
-    const rotation = daysSinceStart % 7; // 6-day cycle
-
-    let shift;
-    if (group === 'A') {
+    tomorrowDate.setDate(currentDate.getDate() + 1);
+    setTomorrow(moment(tomorrowDate).format("YYYY-MM-DD"));
+  
+    try {
+      const group = await getGroup();
+      const daysSinceStart = Math.floor(
+        (currentDate - startDate) / (1000 * 60 * 60 * 24)
+      );
+      const rotation = daysSinceStart % 7;
+  
+      let shift = { current: "", next: "" };
+  
+      if (group === 'Red Eagle') {
         if (rotation === 0 || rotation === 1) {
             shift = { current: "Morning", next: "Evening" };
         } else if (rotation === 2 || rotation === 3) {
@@ -90,7 +100,7 @@ console.log("ur group",group)
         } else {
           shift = { current: "Morning", next: "Evening" };
       }
-    } else if (group === 'B') {
+    } else if (group === 'White Ox') {
         if (rotation === 0 || rotation === 1) {
             shift = { current: "Evening", next: "Off" };
         } else if (rotation === 2 || rotation === 3) {
@@ -100,7 +110,7 @@ console.log("ur group",group)
         }else {
             shift = { current: "Evening", next: "Off" };
         }
-    } else if (group === 'C') {
+    } else if (group === 'Blue Falcon') {
       if (rotation === 0 || rotation === 1) {
           shift = { current: "Off", next: "Morning" };
       } else if (rotation === 2 || rotation === 3) {
@@ -110,29 +120,27 @@ console.log("ur group",group)
       } else {
           shift = { current: "Off", next: "Morning" };
       }
-  }
-
-    return shift;
-
-}catch(error){
-  console.log(error)
-}
-};
-
-axios.defaults.withCredentials = true
-
-  useEffect(() => {
-     
-      
-    calculateShift()
-    .then(data=> {
-      setCurrentShift(data.current)
-      setNextShift(data.next)
-    })
-    .catch(err=> console.log(err))
-    
+      }
   
-    
+      // Optionally determine what is *currently active* by hour
+      const hour = new Date().getHours();
+      let activeShift = "Off";
+      if (shift.current === "Morning" && hour >= 8 && hour < 19) {
+        activeShift = "Morning";
+      } else if (shift.current === "Evening" && (hour >= 19 || hour < 8)) {
+        activeShift = "Evening";
+      }
+  
+      setCurrentShift(activeShift);
+      setNextShift(shift.next);
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  useEffect(() => {
+    calculateShift();
   }, []);
 
   const handleRadioInput = (e) => {
@@ -167,7 +175,7 @@ axios.defaults.withCredentials = true
       })
       return;
     }
-    const response= await axios.post("api/shift/start-shift",{lxeNumber,radioNumber,location: location.placeName,currentShift})
+    const response= await axios.post("/api/shift/start-shift",{lxeNumber,radioNumber,location: location.placeName,currentShift})
     console.log(response.data)
    
     setShiftStarted(true);
@@ -223,6 +231,7 @@ axios.defaults.withCredentials = true
               setLocation((prev) => ({ ...prev, placeName: "Location not found" }));
             }
           } catch (error) {
+            console.log(error)
             setLocation((prev) => ({ ...prev, error: "Failed to fetch location name" }));
           }
         },
@@ -238,6 +247,101 @@ axios.defaults.withCredentials = true
   
   
   
+  const [email, setEmail] = useState('');
+  const [requestType, setRequestType] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [missedSignOut, setMissedSignOut] = useState(false)
+
+  const [disabledLxe, setDisabledLxe] = useState(false)
+  useEffect(()=>{
+      const getShift = async () =>{
+        try{
+          const response = await axios.get("/api/shift/check-shift");
+          const { status, data } = response;
+
+          if (status === 200 && data.message === "User is currently on shift. Shift has not ended yet.") {
+            setShiftStarted(true);
+            setIsCompleted(false);
+            setMissedSignOut(false);
+          } else if (status === 201 && data.message === "User has already signed out today.") {
+            setShiftStarted(false);
+            setIsCompleted(true);
+            setMissedSignOut(false);
+          } else if (status === 202 && data.message === "Shift ended. User did not sign out. Marked as missed sign-out.") {
+            setShiftStarted(false);
+            setIsCompleted(true);
+            setMissedSignOut(true); // handle this in UI if needed
+          }
+         
+      }catch(error){
+        if(error.response && error.response.status === 401){
+        Modal.warning({
+          title: "Session Expired",
+          content: "Your session has expired. Please log in again.",
+          okText: "Login",
+          onOk: () => {
+            
+            navigate("/")
+          },
+        });
+      }
+        console.log(error)
+      }
+    }
+    getShift() 
+  },[])
+
+  // Show the modal when the user clicks the button
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  // Hide the modal
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  // Function to handle button clicks (LXE or Radio)
+  const handleRequestType = (type) => {
+    setRequestType(type);
+  };
+
+  // Function to handle the form submission
+  const handleSubmit1 = async () => {
+    if (!email || !requestType) {
+      message.error('Please enter an email and select a request type');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/shift/submit-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, requestType }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        message.success('Request submitted successfully');
+        // Optionally, navigate to another page after success
+        
+        handleCancel(); // Close the modal after submission
+      } else {
+        message.error(data.error || 'Failed to submit request');
+      }
+    } catch (error) {
+      console.error('Error submitting request:', error);
+      message.error('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -255,14 +359,14 @@ axios.defaults.withCredentials = true
    
     setShiftStarted(false);
     setRadioNumber("");
-    setLxcNumber("");
+    setLxeNumber("");
     setRadioAssigned(false);
     setLxcAssigned(false);
     navigate("/");
 
     return
       }
-      console.log(error)
+     
 
   }catch(error){
      console.log(error)
@@ -287,31 +391,73 @@ axios.defaults.withCredentials = true
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
-  useEffect(()=>{
-      const getShift = async () =>{
-        try{
-       const response= await axios.get("api/shift/check-shift")
 
-       console.log(response)
-        if(response.data==="Shift has started today."){
-          console.log(response.data)
-          setShiftStarted(true)
-        }else if(response.status===201){
-          setShiftStarted(false)
-          console.log("new")
-          setIsCompleted(true)
-        }
-      }catch(error){
-        console.log(error)
-      }
-    }
-    getShift() 
-  },[])
+ 
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "20px" }}>
-     <div>{location.placeName}</div>
-      <Card>
+        
+       <Modal
+        title="Request Form"
+        open={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+        width={400}
+      >
+        <div>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                size="large"
+                style={{ marginBottom: '10px' }}
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16} style={{ marginTop: '20px' }}>
+            <Col span={12}>
+              <Button
+                onClick={() => handleRequestType('LXE')}
+                type={requestType === 'LXE' ? 'primary' : 'default'}
+                size="large"
+                style={{ width: '100%' }}
+              >
+                Request LXE
+              </Button>
+            </Col>
+            <Col span={12}>
+              <Button
+                onClick={() => handleRequestType('Radio')}
+                type={requestType === 'Radio' ? 'primary' : 'default'}
+                size="large"
+                style={{ width: '100%' }}
+                disabled={disabledLxe}
+              >
+                Request Radio
+              </Button>
+            </Col>
+          </Row>
+
+          <Row gutter={16} style={{ marginTop: '20px' }}>
+            <Col span={24}>
+              <Button
+                onClick={handleSubmit1}
+                type="primary"
+                size="large"
+                loading={loading}
+                style={{ width: '100%' }}
+              >
+                Submit Request
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      </Modal>
+
+      <Card style={{border:"1px solid #d9d9d9",borderRadius:"10px"}}>
         <Title level={3}>Welcome, {user}</Title>
         <Text strong>Today's Shift:</Text> <Text>{currentShift}</Text>
         <br />
@@ -319,7 +465,7 @@ axios.defaults.withCredentials = true
       </Card>
       
       {currentShift !== "Off" && (
-        <Card style={{ marginTop: 20 }}>
+        <Card style={{ marginTop: 20 ,border:"1px solid #d9d9d9",borderRadius:"10px"}}>
           <Title level={4}>Enter Equipment Details</Title>
           <Space direction="vertical" style={{ width: "100%" }}>
             <Input
@@ -328,12 +474,18 @@ axios.defaults.withCredentials = true
               onChange={handleRadioInput}
               disabled={shiftStarted}
             />
-            <Input
+            {disabledLxe ? (
+              <Input
               placeholder="Enter LXE Number"
               value={lxeNumber}
               onChange={handleLxcInput}
               disabled={shiftStarted}
             />
+              
+            ) : (
+              ""
+            )}
+            
           </Space>
         </Card>
       )}
@@ -358,18 +510,19 @@ axios.defaults.withCredentials = true
           <Button type="default" danger onClick={handleSignOut} disabled={!shiftStarted}>
             Sign Out
           </Button>
+          <Button type="primary" onClick={showModal}>Request LXE/Radio</Button>
         </Space>
       )}
 
-      {shiftStarted && location && (
-        <Card style={{ marginTop: 20 }}>
-          <Text strong>Current Crane Location:</Text>
+      
+        <Card style={{ marginTop: 20 ,border:"1px solid #d9d9d9",borderRadius:"10px"}}>
+          <Text strong>Your Current Location:</Text>
           <Text>
-            {location.latitude}, {location.longitude}
+          {location.placeName}
           </Text>
-          <CraneLocation location={location} />
+          
         </Card>
-      )}
+      
     </div>
   );
 }

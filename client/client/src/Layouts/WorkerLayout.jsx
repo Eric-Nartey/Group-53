@@ -1,4 +1,4 @@
-import React,{lazy,Suspense} from 'react'
+import {lazy,Suspense} from 'react'
 import Navbar from "../Components/Navbar";
 const Dashboard = lazy(()=> import("../Pages/Dashboard")) ;
 import {  Routes, Route } from "react-router-dom";

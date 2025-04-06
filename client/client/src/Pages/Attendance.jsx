@@ -144,8 +144,8 @@ const CustomTooltip = ({ active, payload }) => {
   
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-semibold text-blue-600 mb-4">Attendance Dashboard</h2>
+    <div >
+      <h2 style={{ fontSize: "1.5rem", fontWeight: "600",width:"fit-content", color: "#2563EB",marginTop:"40px",marginInline:"auto", marginBottom: "1rem" }}>Attendance Dashboard</h2>
 
       {/* Sign-in Count */}
       <Card className="mb-6 p-4 shadow-lg">

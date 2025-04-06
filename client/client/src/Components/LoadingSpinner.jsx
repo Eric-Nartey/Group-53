@@ -1,4 +1,4 @@
-import React from "react";
+
 import "../Styles/LoadingSpinner.css"; // Import the CSS file
 
 const LoadingSpinner = () => {

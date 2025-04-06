@@ -487,9 +487,9 @@ useEffect(() => {
   </Select>
 
   <Select placeholder="Select Group" value={newUser.group} onChange={(value) => setNewUser({ ...newUser, group: value })} style={{ width: '100%', marginBottom: 10 }}>
-    <Select.Option value="Group A">Group A</Select.Option>
-    <Select.Option value="Group B">Group B</Select.Option>
-    <Select.Option value="Group C">Group C</Select.Option>
+    <Select.Option value="Red Eagle">Red Eagle</Select.Option>
+    <Select.Option value="Blue Falcon">Blue Falcon</Select.Option>
+    <Select.Option value="White Ox">White Ox</Select.Option>
   </Select>
 
   <Button type="primary" block onClick={handleAddUser}>Add User</Button>

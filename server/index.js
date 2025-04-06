@@ -22,13 +22,14 @@ app.use(cors({
 
 
 // Import routes
-const authRoutes = require('./Routes/AuthRoutes');
-const userRoutes = require('./Routes/UserRoutes');
+const authRoutes = require('./Controllers/AuthRoutes');
+const userRoutes = require('./Controllers/UserRoutes');
 
-const attendanceRoutes = require('./Routes/AttendanceRoutes');
+const attendanceRoutes = require('./Controllers/AttendanceRoutes');
 
-const adminRoutes = require('./Routes/AdminRoutes');
-const shiftRoutes =require('./Routes/ShiftRoute')
+const adminRoutes = require('./Controllers/AdminRoutes');
+const shiftRoutes =require('./Controllers/ShiftRoute')
+
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -38,6 +39,7 @@ app.use('/api/attendance', attendanceRoutes);
 
 app.use('/api/lxeRadio', adminRoutes);
 app.use('/api/shift', shiftRoutes);
+
 
 
 
