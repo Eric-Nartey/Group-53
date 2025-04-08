@@ -13,8 +13,12 @@
   
   .navbar-links {
     display: flex;
+    
     gap: 1.5rem;
     align-items: center;
+  }
+  .navbar-links a{
+    font-size: 14px;
   }
   
   /* Navbar dropdown (hidden by default on small screens) */
@@ -39,11 +43,27 @@
   .navbar-dropdown a:hover {
     background-color: #f0f0f0;
   }
+
+  .hamburger-menu {
+    display: none; /* Show hamburger icon */
+  }
   
   /* Display hamburger menu on small screens (max-width: 768px) */
   @media (max-width: 768px) {
     .navbar-links {
       display: none; /* Hide text links */
+    }
+
+    .navbar-links {
+      
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+
+      a{
+        font-size: 14px;
+      }
     }
   
     .hamburger-menu {

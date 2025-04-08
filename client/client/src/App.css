@@ -13,6 +13,7 @@ body{
 
 .active{
   position: relative;
+  
 }
 
 .active::before{
@@ -23,8 +24,16 @@ body{
   transform: translate(-50%,-50%);
   background-color: aliceblue;
   height: 4px;
-  bottom: -27px;
+  bottom: -50px;
   border-bottom: 1px solid #1e3a8a;
   border-radius: 5px;
+}
+
+
+@media (max-width: 768px) {
+  .active::before{
+    width: 0;
+    
+  }
 }
 

@@ -95,13 +95,13 @@ router.get('/report', async (req, res) => {
 
   const startOfMonth = new Date(year, month - 1, 1); // Start of the month
   const endOfMonth = new Date(year, month, 0); // End of the month
-
+  console.log('Start of Month:', startOfMonth, 'End of Month:', endOfMonth); // Log the start and end dates
   try {
     // Fetch attendance records for the selected month and year
     const attendanceRecords = await Attendance.find({
       sign_in_time: { $gte: startOfMonth, $lte: endOfMonth },
     })
-      .populate('userId', 'name email') // Populate user data
+      .populate('userId', 'fullname email') // Populate user data
       .populate('Lxe_id', 'lxe_number location') // Populate LXE data
       .populate('radio_id', 'radio_number'); // Populate Radio data
 
@@ -157,7 +157,7 @@ router.get('/report', async (req, res) => {
       },
     };
 
-    res.json(reportData);
+    res.status(200).json(reportData);
   } catch (error) {
     console.error('Error generating report:', error);
     res.status(500).json({ error: 'Failed to generate report' });

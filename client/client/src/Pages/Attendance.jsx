@@ -155,8 +155,9 @@ const CustomTooltip = ({ active, payload }) => {
       {/* Attendance Table */}
       <Card className="mb-6 p-4 shadow-lg">
         <h3 className="text-lg font-medium mb-3">Attendance Records</h3>
-        <Table dataSource={data} columns={columns} pagination={{ pageSize: 5 }} rowKey={(record, index) => index} />
-
+        
+        <Table dataSource={data} columns={columns} scroll={{ x: 'max-content' }}  pagination={{ pageSize: 5 }} rowKey={(record, index) => index} />
+        
       </Card>
 
       {/* Attendance Chart */}

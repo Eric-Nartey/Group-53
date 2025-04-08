@@ -79,9 +79,7 @@ const Login = () => {
         <p style={{color:"red"}}>{error}</p>
         <button type="submit" className="submit">Login</button>
         <section style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop: "15px"}}>
-        <button type="button" className="link">
-        <Link to={"/signup"} > Don't have an account?</Link>
-        </button>
+        
         <button style={{border:"none",background:"transparent"}}><Link to={"/forget_password"} style={{textDecoration:"none",}}>Forget password?</Link></button>
         </section>
       </form>

@@ -9,7 +9,7 @@ const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 import '../Styles/AdminDashboard.css';
-import {useNavigate} from 'react-router-dom'
+import {NavLink, useNavigate} from 'react-router-dom'
 import useLogout from '../Hooks/Logout';
 
 
@@ -336,6 +336,9 @@ useEffect(() => {
               <Menu.Item key="3">Radio</Menu.Item>
               <Menu.Item key="4">LXE</Menu.Item>
             </Menu>
+            <NavLink to="/reports" style={{ textDecoration: "none", color: "#333" }}>
+              <Button type="primary" icon={<PlusOutlined />} style={{ marginTop: "20px", width: "100%" }} >Reports</Button>
+            </NavLink>
           </Sider>
   
 
@@ -356,6 +359,7 @@ useEffect(() => {
       />
                 <Table
   dataSource={filteredAttendance}
+  scroll={{ x: 'max-content' }}
   columns={[
     { title: "Name", dataIndex: ["userId", "fullname"], key: "name" },
     { title: "Session", dataIndex: "shiftType", key: "session" },
@@ -403,6 +407,7 @@ useEffect(() => {
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setUserModalOpen(true)}>Add User</Button>
                   <Table
   dataSource={users}
+  scroll={{ x: 'max-content' }}
   columns={[
     { title: "Name", dataIndex: "fullname", key: "fullname" },
     { title: "Email", dataIndex: "email", key: "email" },
@@ -427,6 +432,7 @@ useEffect(() => {
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setRadioModalOpen(true)}>Add Radio</Button>
                   <Table
   dataSource={radio}
+  scroll={{ x: 'max-content' }}
   columns={[
     { title: "Radio Number", dataIndex: "radio_number", key: "radio_number" },
     {
@@ -449,6 +455,7 @@ useEffect(() => {
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => setLxeModalOpen(true)}>Add LXE</Button>
                   <Table
   dataSource={lxe}
+  
   columns={[
     { title: "LXE Number", dataIndex: "lxe_number", key: "lxe_number" },
     {
@@ -478,7 +485,7 @@ useEffect(() => {
   <Input placeholder="Email" type="email" value={newUser.email} onChange={(e) => setNewUser({...newUser,email:e.target.value})} style={{ marginBottom: 10 }} />
   <Input placeholder="Password" type="password" value={newUser.password} onChange={(e) =>  setNewUser({...newUser,password:e.target.value})} style={{ marginBottom: 10 }} />
 
-  <Select placeholder="Select Role" value={newUser.role} onChange={(value) => setNewUser({ ...newUser, role: value })} style={{ width: '100%', marginBottom: 10 }}>
+  <Select placeholder="Select Role" placeholder="User role" value={newUser.role} onChange={(value) => setNewUser({ ...newUser, role: value })} style={{ width: '100%', marginBottom: 10 }}>
     <Select.Option value="Supervisor" >Supervisor</Select.Option>
     <Select.Option value="Admin">Admin</Select.Option>
     <Select.Option value="Lasher">Lasher</Select.Option>
@@ -486,7 +493,7 @@ useEffect(() => {
     <Select.Option value="Worker">Worker</Select.Option>
   </Select>
 
-  <Select placeholder="Select Group" value={newUser.group} onChange={(value) => setNewUser({ ...newUser, group: value })} style={{ width: '100%', marginBottom: 10 }}>
+  <Select placeholder="Select Group" placeholder="Group" value={newUser.group} onChange={(value) => setNewUser({ ...newUser, group: value })} style={{ width: '100%', marginBottom: 10 }}>
     <Select.Option value="Red Eagle">Red Eagle</Select.Option>
     <Select.Option value="Blue Falcon">Blue Falcon</Select.Option>
     <Select.Option value="White Ox">White Ox</Select.Option>

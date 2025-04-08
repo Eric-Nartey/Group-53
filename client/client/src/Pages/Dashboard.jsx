@@ -210,7 +210,7 @@ function Dashboard( ) {
     error: null,
   });
 
-  useEffect(() => {
+  function getLocationName() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -242,7 +242,11 @@ function Dashboard( ) {
     } else {
       setLocation((prev) => ({ ...prev, error: "Geolocation is not supported" }));
     }
+  }
+  useEffect(() => {
+    getLocationName();
   }, []);
+  
 
   
   
@@ -424,6 +428,7 @@ function Dashboard( ) {
                 type={requestType === 'LXE' ? 'primary' : 'default'}
                 size="large"
                 style={{ width: '100%' }}
+                disabled={disabledLxe}
               >
                 Request LXE
               </Button>
@@ -434,7 +439,7 @@ function Dashboard( ) {
                 type={requestType === 'Radio' ? 'primary' : 'default'}
                 size="large"
                 style={{ width: '100%' }}
-                disabled={disabledLxe}
+                
               >
                 Request Radio
               </Button>
@@ -449,6 +454,7 @@ function Dashboard( ) {
                 size="large"
                 loading={loading}
                 style={{ width: '100%' }}
+                disabled={!email || !requestType || currentShift==="Off"}
               >
                 Submit Request
               </Button>
@@ -502,7 +508,10 @@ function Dashboard( ) {
         <Space style={{ marginTop: 20 }}>
           <Button
             type="primary"
-            onClick={handleStartShift}
+            onClick={()=> {
+              handleStartShift()
+              getLocationName();
+            }}
             disabled={currentShift === "Off" || shiftStarted || (radioAssigned && lxcAssigned)}
           >
             {currentShift === "Off" ? "No Shift Today" : "Start Shift"}
