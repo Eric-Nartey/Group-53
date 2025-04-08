@@ -1,25 +1,48 @@
-.attendance {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    border-radius: 5px;
-    width: 90%;
-    margin-inline: auto;
-  }
-  
-  h3 {
-    font-size: 20px;
-    color: #1e3a8a;
-  }
-  
-  ul {
-    list-style-type: disc;
-    margin-left: 20px;
-    color: #6b7280;
-  }
-  
-  li {
-    margin: 5px 0;
-  }
-  
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2563EB;
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 1rem;
+}
+
+.sign-in-cards {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.sign-in-card {
+  width: 45%;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.count {
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.attendance-table-card {
+  margin-bottom: 20px;
+}
+
+.table-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.attendance-chart-card {
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
