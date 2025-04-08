@@ -12,8 +12,8 @@ router.post('/post-lxe',verifyAdmin, async(req, res) => {
       const findLxe= await Lxe.findOne({lxe_number:lxeNumber})
       if(findLxe) return res.status(400).json({message:"LXC already exist"})
       const LxeNumber= await Lxe.insertMany({lxe_number:lxeNumber}) 
-    res.status(201).send({ message: 'New LXC added successfully', data: LxeNumber });
-
+    res.status(200).send({ message: 'New LXC added successfully', data:LxeNumber });
+     console.log(LxeNumber)
     }catch(error){
         res.status(500).json({message:"Failed to add LXC",error})
     }
@@ -47,7 +47,7 @@ router.post('/post-radio',verifyAdmin,async (req, res) => {
         const findRadio= await Radio.findOne({radio_number:radioNumber})
       if(findRadio) return res.status(400).json({message:"Radio already exist"})
         const RadioNumber= await Radio.insertMany({radio_number:radioNumber}) 
-    res.status(201).send({ message: 'New Radio added successfully', data: RadioNumber });
+    res.status(200).send({ message: 'New Radio added successfully', data: RadioNumber });
     }catch(error){
         console.log(error)
         res.status(500).json({message:"Failed to add Radio",error}) 
@@ -80,7 +80,7 @@ router.get('/get-lxes',verifyAdmin, async(req, res) => {
     try{
 
       const lxeNumber= await Lxe.find({}) 
-    res.json(lxeNumber);
+    res.status(200).json(lxeNumber);
 
     }catch(error){
         res.status(500).json({message:"Failed to add LXE",error})

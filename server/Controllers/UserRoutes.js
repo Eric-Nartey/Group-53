@@ -35,7 +35,7 @@ router.post('/signup', async (req, res) => {
     const encryptedPassword= await bcrypt.hash(password,10)  //Encrypt the password using bcrypt
     const newUser = new User({ fullname, email,role,group,password:encryptedPassword });
     await newUser.save(); // Save the new user to the database
-    res.status(200).json({message:"Sign up successfull"}); // Send a success message to the client
+    res.status(200).json({message:"Sign up successfull",data:newUser}); // Send a success message to the client
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'Error creating user', error });

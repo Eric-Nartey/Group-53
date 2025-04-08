@@ -16,7 +16,7 @@ import useLogout from '../Hooks/Logout';
 const AdminDashboard = () => {
   const { Search } = Input;
     const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState({ fullname:'', email: '', password:'',role:'',group:'' });
+    const [newUser, setNewUser] = useState({ fullname:'', email: '', password:'',role:undefined,group:undefined });
     const [newRadio, setNewRadio] = useState("");
     const [newLxe, setNewLxe] = useState("");
     const [attendance, setAttendance] = useState([]);
@@ -207,9 +207,12 @@ const AdminDashboard = () => {
         try{
         const response= await axios.post('/api/lxeRadio/post-radio',{radioNumber:newRadio});
         const Data= response.data.data;
+        if(response.status===200){
+        setNewRadio('')
         setRadio(prevData => [...Data,...prevData])
-        console.log(response.data)
-        
+        setRadioModalOpen(false)
+        message.success("New Radio added!")
+        }
         }catch(error){
             console.log(error)
         }
@@ -222,8 +225,14 @@ const AdminDashboard = () => {
         const response=await axios.post('/api/lxeRadio/post-lxe',{lxeNumber:newLxe});
          
          const Data=response.data.data
+         if(response.status===200){
          setLxe(prevData => [...Data,...prevData])
+         message.success("New LXE added!")
+         setNewLxe('')
+         setLxeModalOpen(false)
+         }
         }catch(error){
+          message.error("Failed to add LXC")
             console.log(error)
         }
     };
@@ -273,6 +282,8 @@ const AdminDashboard = () => {
         const response = await axios.post('/api/users/signup', newUser);
         if(response.status===200){
             message.success("New user added!");
+            setUserModalOpen(false)
+            setUsers(prevData => [response.data.data,...prevData])
          }else{
             message.error("Error adding user !")
          }
@@ -322,9 +333,15 @@ useEffect(() => {
         <Header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#001529", padding: "0 20px" }}>
           <Title level={3} style={{ color: "white", margin: 0 }}>Attendance System</Title>
           <Space>
-            <Text style={{ color: "white" }}>{user}</Text>
-            <Button shape="circle" icon={<UserOutlined />} />
+            
+            
             <Button icon={<LogoutOutlined />} onClick={logout} danger>Logout</Button>
+            <Button 
+              shape="circle" 
+              style={{ width: 30, height: 30, padding: 0, textAlign: 'center' }}
+            >
+              <span style={{ fontSize: '18px', color: '#222' }}>{user[0]}</span>
+            </Button>
           </Space>
         </Header>
   
@@ -493,7 +510,7 @@ useEffect(() => {
     <Select.Option value="Worker">Worker</Select.Option>
   </Select>
 
-  <Select placeholder="Select Group" placeholder="Group" value={newUser.group} onChange={(value) => setNewUser({ ...newUser, group: value })} style={{ width: '100%', marginBottom: 10 }}>
+  <Select placeholder="Select Group"  value={newUser.group} onChange={(value) => setNewUser({ ...newUser, group: value })} style={{ width: '100%', marginBottom: 10 }}>
     <Select.Option value="Red Eagle">Red Eagle</Select.Option>
     <Select.Option value="Blue Falcon">Blue Falcon</Select.Option>
     <Select.Option value="White Ox">White Ox</Select.Option>
@@ -524,7 +541,7 @@ useEffect(() => {
 
   
         {/* Add LXE Modal */}
-        <Modal title="Add LXE" visible={isLxeModalOpen} onCancel={() => setLxeModalOpen(false)} footer={null}>
+        <Modal title="Add LXE" open={isLxeModalOpen} onCancel={() => setLxeModalOpen(false)} footer={null}>
           <Input placeholder="LXE Number" value={newLxe} onChange={(e)=> setNewLxe(e.target.value)} style={{ marginBottom: 10 }} />
           <Button type="primary" block onClick={postLxe}>>Add LXE</Button>
         </Modal>
