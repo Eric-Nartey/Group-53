@@ -40,7 +40,7 @@ const AttendanceReport = () => {
   };
 
   // Helper function to generate separate bar chart data for LXE and Radio
-  const getLxeBarChartData = () => {
+  const  getLxeBarChartData = () => {
     return reportData.usageStats.LXE || [];
   };
 
